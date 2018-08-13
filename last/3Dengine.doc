@@ -1,0 +1,596 @@
+﻿
+3DENGINE.DOC
+---------------
+How it all works....  As if *I* knew.
+Pat Struthers 1/18/2001
+	.. more stuff 5/20/2003 
+
+
+Acknowledgements: Without the following people this would not be 
+	possible..  I won't say WHY to avoid any embarrasment on
+	their parts that the results might create (:b).
+
+	Jon Sumner and Robert McMillan
+
+	Larry Niven
+	Robert Heilein
+	Greg Benford
+
+	Dan Gookin, my programming GURU
+	Linus Torvalds
+	Michael Weller (svgalib documentation/maintenance)
+	Harm Hanemaayer (svgalib original author)
+
+
+Revision history
+----------------
+01/18/2001 -- Started this file (hopefully I will maintain it).
+
+01/20/2001 -- Added file, structure, and function descriptions
+
+05/20/2003 -- Continuing operational descriptions
+
+Introduction:
+----------------
+	I have been researching and fantasizing about a really GOOD 
+science fiction simulation system since I started reading Larry Niven and
+Greg Benford back at Heppner High School.  I've often told people that I
+went to college because that was the only way to learn enough physics,
+math, astronomy and ect. to actually do justice to the idea.
+
+	The project was to be called GALACTIC EXPLORER (how original) 
+and would be a general purpose multi-player space exploration simulation.
+I have been gathering data and researching methods since at least 1983,
+and the original idea was started by an article in Creative Computing
+(I don't know the author or date) that detailed a random Solar System 
+program. 
+
+	Well, about 4 years ago I finally got tired of waiting
+for someone else to do it, so I collated a large number of my code 
+fragments for this thing into a common system.  I knew right away that
+I would want a VERY NICE display system that accurately represented 
+the type of situations I was interested in (EVIL ALIENS ARE ATTACKING
+FROM THEIR SECRET BASE ON THE FIFTH MOON OF XCGFLUB!  JUMP IN YOUR
+SHIP AND BLAST THEM INTO THEIR CONSTITUENT....).
+	THUS, Pat's 3D Engine was born.  Originally I was using Visual
+C++ ver 1.1 to develop this for DOS environments, but the simple answer
+is, MICROSOFT SUCKS!  The programming environment is EXCEPTIONALLY buggy,
+ slow, there are very many memory and device limitations, and so on.
+I finished the preliminary version of this in mid-summer of 1997, then
+dropped it in disgust and loathing.  I had previously tried to use
+(perversely) Quick Basic 4.5 for this but that was even worse.  I thought
+maybe I was doing something vaguely wrong at that time, and let the 
+project rest.  As it turned out, this was all to the good, and we all
+know now that Bill is TRULY EVIL and that it never had to be this way.
+
+	Then LINUX came along and SAVED THE WORLD.  If you have never 
+programmed under a REAL operating system, your are really missing something.
+And Linux is it (Thank you Linus!).  So now things are just great, and
+I know that when the thing blows up, it really IS my fault.
+
+	Pat's 3D Engine is all written in straight ANSI C (none of that
+effing object oriented shit) using the svgalib graphics libraries 
+originally developed by Harm Hanemaayer and currently maintained by 
+Michael Weller.  I use gcc and make and very little else, although
+Perl and mySQL may be drafted to the job when I get going on the
+multi-server / multi-process version of this project.
+	I also think GUIs SUCK (even X, good as it is) so this will
+be strictly console based, and because of the realities of Linux/Unix
+security, it will NOT be a system that can be run on a large multi-
+purpose network.  svgalib (and, I suspect, any decent graphics system)
+MUST be used as root in order to allow the user at the local graphics
+hardware, and I am NOT going to dumb this system down just so Joe
+Public can run it over the Internet on his Win32 piece of junk.  A
+dedicated private LAN is more my target, and the machines need not be
+particularly fast (I have been developing this on a Pentium 166 with
+only 32MB of RAM and a Trident 2MB PCI card).  Beowulf clusters are
+a particularly enticing platform for this, but WE'RE not ready for that
+yet (maybe in a year or two....).
+
+3D Graphics in general..
+------------------------
+	First, get out your yardstick and measure your screen....  Really
+this IS the first step.  Typically I use 0.5 m for the observer's distance
+from the screen and (since I'm using a 15" SVGA monitor) about the same
+for the width (got to make it a little wider than the real thing to get
+any reasonable field of view).  Until you do this it is difficult to 
+imagine the geometric situation and how to translate into pixels on the
+screen.  Decide, based on screen resolution, how many pixels represent
+how many meters when an object is that distance away (0.5m, I mean)
+and you are well started.
+	Actually, I use POLAR coordinates for the screen conversion, so
+you convert the altitude and azimuth angles into pixels instead.  Zero
+azimuth and altitude is the center of the screen.  Azimuth is ranges
+(+/- 180) and altitude (+/- 90) and the screen is typically around 
+30 degrees wide by 25 up-and-down.  Oh, yeah, and I use radians, not
+degrees.
+	Then you define a coordinate space to hold all your objects.  I 
+have defined the +X direction as directly forwards, +Y as 'left' and
++Z as 'up'.  I use standard double-precision floating point to store
+the positions etc. of all objects internally, and I use standard MKS
+(meters/kilograms/seconds) units for everything.  This is partly because
+I am biased toward a close correspondence between the simulated objects
+and the actual physical situation, and partly because it seems easier
+for me (intuitively) to visualize for programming purposes.
+	Double precision is ABSOLUTELY REQUIRED if (for instance) a 
+very large, very complex rotating object is to be accurately represented.
+Orbital calculations are also very sensitive to rounding and precision
+errors.  In addition, we are going to be dealing with literally 
+astronomical distances (from 1 meter to hundreds of thousans of 
+light years) and systematic errors can't be allowed to sneak in here, 
+either.
+	 All objects are defined by one or more linked lists of related 
+objects; the objects are in turn composed of vertices, faces and 
+segments.  Optionally one can also give the objects individual movement, 
+rotation, reflectance and luminosity, mass, and more. 
+	I use ONLY triangles for my faces, so each one is defined by the 
+three vertices, in CCW order, that make up its corners.  A double precision
+three vector structure called dVECTOR (.vx, .vy, .vz) is the basic unit
+for almost EVERYTHING the engine does.
+	There is a large library of vector functions for dot- and cross- 
+product, scalar product, addition and magnitude ('length'), rotations,
+and so on, and these are used exhaustively.
+	To find out where (or if) a given face is on the screen, I first
+convert the coordinates of its vertices into the coordinate system of the
+observer's field of view.  This is done by SUBTRACTING the observer's
+current position (which is not always 0,0,0 unless you don't want to move) from
+the position vector of the vertex, then finding the dot-product of that
+vertex with each of your coordinate axes (which may or not be 
+equivalent to the X, Y, Z axes).  From there all you have to do is convert
+ this vector into screen coordinates by finding the polar coordinates
+of that vector and converting the angles to pixels.
+	This is ALL THERE IS TO IT!  I've had some kind of program to
+draw wire-frames of objects since high school (on a 1Mhz Apple II!) and
+the method is so simple that decent preformance is possible on very 
+modest hardware.
+	BUT... If you want realistic hidden surfaces, lighting effects, 
+complex object movement, distortion, etc. there is more work to do:
+
+	HIDDEN SURFACES:  Basically, you don't draw any face that is pointing
+away from you (at least on closed objects) and you don't want to draw a face
+that is behind something closer, or behind you.
+	Calculate the normal vector of the face by taking the cross product of
+two sides and 'unitizing' (i.e. normalizing the length to 1, regardless
+of direction).  The normal is perpendicular to the face if you use two
+sides in the CCW direction (right-hand rule!  forward x left = up).
+	If you dot-product the normal with the your direction vector to the
+center of the face, you get the the cosine of the angle between them.  Since
+you want to see the faces that are pointed TOWARD you, this will be 
+NEGATIVE (cosine of > 90 or > -90 is < 0).
+	When you convert the vertex coordinates to those of the observer
+it is should be clear that if the X-coordinate of that vertex is 
+NEGATIVE, that vertex is behind you.  So only try to draw the ones where
+it is positive (actually, this is not exactly true, since you are 
+drawing faces instead of vertices.  One vertex of a given face may very
+well be behind you while another is ahead. FUN FUN.).
+	Finally, sort all the ones that are left by distance, then draw
+them farthest to nearest.  The nearest are drawn last so they will cover up
+anything they're in front of.
+	Actually you don't want to draw anything outside your field of view
+either but you run into the same problems as with the behind/in-front of
+you thing.  Generally let clipping take care of this and ONLY throw out 
+faces where EVERY vertex is off the screen (easy to check in the
+routine that calcs the screen coordinates).  I add a little slack to make
+the clipping look better.
+	All of the above is currently done by the DrawZS3D function in the
+3ddefs.c code module.  DrawZS3D also calls the lighting subfunctions 
+(FcShade3D and LtShade3D) and the triangle drawing routine.
+
+	LIGHTING: Designate certain objects as luminous.  Calculate how 
+far that object is from the face you are working on, and what angle it
+is facing toward that object (dot product of the normal and the direction
+vector TO that object).  Light falls of by the square of the distance 
+not only between that face and the object but between the face and the
+observer. 
+	Once you have an idea how much that face is illuminated, adjust
+the RGB values of the face up or down accordingly.  I set all my colors
+for objects around the middle range (128 max for each color component)
+ so this works out right.  I also have a 'light gain' adjustment in the
+display engine so that you can change the brightness of the shaded faces.   
+I also take into account the reflectance of that face, which is a percentage
+value expressed by a number between 0.0 and 1.0 (i.e. 55% == 0.55).  
+	To represent the luminosity of objects, I use an inverse logrithmic
+magnitude scale directly analogous to the one used by astronomers. 
+This works because the human eye also responds to light levels
+logrithmically rather than linearly.  The Sun is a typical example,
+with a magnitude of -26.7 at the standard distance (93 million miles), 
+while the bright star Vega has an APPARENT magnitude of around 0.0 at
+its distance of 27 light years or so.
+
+	SHADOWS AND REFLECTED LIGHT: Currently this is NOT implemented for
+very good reasons:  it is computationally heavy and I don't (at this point)
+want to slow the engine down.
+	Shadowing is the easier, and should theoretically work as follows:
+	Basically, you must determine which objects obstruct the casting
+of light by their sources, more less defining a solid angle where that light
+does not fall, then deciding whether a given face falls within that solid
+angle.  Currently the data structures I am using make this a very tricky 
+thing to do, and for reasons of performance I am not likely to implement
+it soon.  But unlike some other things, it will be done eventually.
+	Reflected light and trasparent surfaces are MUCH harder, and would
+require one to have a luminosity, reflectance, transparency, and etc. 
+defined for every face.  Even if you allow only ONE reflection, this 
+is extremely NON-TRIVIAL, which is why dedicated ray-tracing programs 
+exist and why they cannot animate in realtime except on VERY EXPENSIVE
+hardware.  This is antithetical to my purpose so I am unlikely to EVER
+include such features.   
+
+Basic 3DEngine Usage:
+--------------------------
+
+	Remember to include 3Dmaster.c (as well as any of the svgalib header 
+files you might need):
+
+...
+
+#include <vga.h>    		// standard svgalib stuff
+#include <vgagl.h>			// accelerated drivers etc.
+#include <vgamouse.h>  		// mouse support
+#include <vgakeyboard.h>  	// keyboard support
+
+#include "3Dmaster.c"		// this is a master file that gets 3ddata.c,
+						// 3ddefs.c, 3dext.c, 3dobjm.c etc.
+...
+
+	Then you need to create at least two pointers of type p3DObjL:  one to 
+keep track of the head link of the object list and the other to point at 
+individual links in the list.
+
+	p3DObjL obja, obji;  // 'obja' will be pointer to the head link, and
+						// 'obji' will be a pointer to a particular instance.  
+
+	To initialize the object list, just add on object using either AddObj3D
+or one of the special object generating routines (SphereObj or ExtrudeObj)
+and set 'obja' equal to the returned pointer:
+
+	obja = SphereObj(obja, radius, part, center, rflag, rp1, rp2); 
+
+		// Generates a sphere with 'radius' at 'center', partitioned 
+		// 'part' times from an octahedron.  If 'rflag' is >0 then
+		// 'rp1' and 'rp2' are used to randomly vary the radius of the
+		// surface as it is partitioned.
+
+	Any subsequent calls to AddObj3D or the special routines return a 
+pointer to the added object rather than the head link, i.e:
+
+	obji = DegenObj(obja, radius, center);
+		// Add another object (a 'degenerate') to obj. list 'obja'
+
+The following would also work:
+
+	DegenObj(obja, radius, center);
+	obji = obja->ox;  // the '.ox' field always points to the LAST
+					// link in the object list.
+
+
+	If you use AddObj3D instead, the vertices and faces lists will not be
+defined until you use AddFace3D and AddVert3D:
+
+	AddVert3D(obji, vector);  // adds a vertex to 'obji' with coords. 'vector'
+	AddFace3D(obji);  // adds an undefined face.  
+
+	Note that AddFace has no other parameters.  Since each face takes 
+three vertices to define it, you must first add the face, then assign the
+vectors, like this:
+
+	dVECTOR vector1, vector2, vector3;
+	p3DObjL obji;
+	p3DVert v1, v2, v3;
+	p3DFace f;
+	...
+
+	v1 = AddVert3D(obji, vector1);
+	v2 = AddVert3D(obji, vector2);
+	v3 = AddVert3D(obji, vector3);
+
+	f = AddFace3D(obji);
+	f->v[0] = v1;
+	f->v[1] = v2;
+	f->v[2] = v3;
+	
+	Note that both AddVert3D and AddFace3D return pointers to the added
+structures.  One can also get to the last added face or vertex through
+the pointers in the object:
+
+	p3DObjL obji;
+	p3DVert v1, v2, v3;
+	p3DFace f;
+
+	...
+
+	AddVert(obji, vector1);
+	v1 = obji->vx;  // 'v1' now points at vertex just added 
+
+	...
+
+	AddFace(obji);
+	f = obji->fx;   // 'f' now points at new face
+
+
+	Other stuff with faces & vertices -- 
+	------------------------------------
+	If you pass a face or vertex to a function and you need to get at
+the parent object of the face/vertex, you can use the pointer 'obj', a
+field in both the _3DVert and _3DFace structures:
+
+void <some function>(p3DVert v, p3DFace f) {
+	p3DObjL objp;
+
+	...
+
+	objp = v->obj;
+		(OR)
+	objp = f->obj;
+
+	...
+
+	return;
+}
+
+
+	When you add a face, the default color is Medium Gray (very boring); also
+a flag is set ('.back') that tells the rendering routine NOT to draw the face
+if it is not facing toward the observer.  These defaults may not be what you
+like so...:
+
+	f = AddFace3D(obji);
+
+	f->rgb = sRRed;   //  color the face 'really' red, instead 
+	f->back = 1;      //  yes, DO draw the back of the face
+
+	A number of useful colors are defined in 3ddata.c also.
+
+
+	Finally, each vertex has a pointer to a segment list.  At this time 
+this is only used by one function, PartObj, from the 3ddefs.c file;  this
+function uses them to partition the faces of a previously defined object.
+In fact, the SphereObj function (3dext.c) calls PartObj in order to generate
+a sphere, sort of like this:
+
+p3DObjL SphereObj(obja, radius, part, center, ...other stuff...) {
+
+	p3DObjL obji;
+
+	... 
+
+	obji = AddObj3D(obja, ...stuff);  // call  AddObj3D to get a new object
+
+	...
+	
+	// more code here to define an octahedron with all vertices 'radius' 
+	// units from 'center'.
+
+	...
+
+	PartObj(obji, part, ...other stuff...);
+	
+}
+
+	That's all!  PartObj generates a new vertex at the midpoint of each
+segment (or edge), then makes four new faces using those vertices.  Then it
+throws out the old faces (the vertices can be reused) and does it again, 
+'part - 1' more times.  Look at the code for PartObj to see how it uses 
+the segment lists to do all this.  
+
+
+	The Rendering Environment
+	-------------------------------------
+
+	In order to actually draw a defined object on the screen, you still
+need to know where the observer is, how wide his field of view is, which way
+direction the observer thinks is 'up', etc. etc.  All this information is
+stored in a structure of type 3DEnv, which is also defined in 3ddata.c:
+
+typedef struct _3denv {
+	dVECTOR opos;	        	// postion of observer
+	dVECTOR ovel;   	  		// velocity of observer
+	dVECTOR oiv;		  	// 'forward' view
+	dVECTOR ojv;		  	// 'left' view
+	dVECTOR okv;		  	// 'up' view
+	double delta;		  	// time scale
+	int hScrn;	 	  		// horizontal size of window (clip region)
+	int vScrn;	 	  		// vertical size of window (clip region)
+	int scols;	 	  		// color mode (32K = 32, 64K =64, 16M = 256)
+	double vscal;		  	// pixels per meter - default = 3.75 * hScrn 
+	int liteon;		  		// do lighting? if not, use Ghod shading
+	int dmode;		  		// drawing mode:  0 - wire frame, 
+							// 1 - solid, 2 - shaded
+	long zscnt;				// last face cnt for z-sort
+							// 0 - initialize,  -1 - reinitialize
+	int view;		  			// which view? 0 current 1-g 2-v 3+ - obj
+	p3DObjL lo[_3DENVLITEMAX];  // pointer to lite object array
+	double lvc;		  			// lighting range scale: 5 typical
+	double lvr;		  			// lighting range: 32 typical
+	p3DObjL nonum[_3DENVTRAKMAX];  // tracked object list
+	p3DObjL tno[_3DENVTRAKMAX];	   // pointer to tracked objects
+	p3DFace nface[_3DENVTRAKMAX];  // closest faces of tracked objects
+	dVECTOR nfp[_3DENVTRAKMAX];	   // last position of near faces
+	dVECTOR nfv[_3DENVTRAKMAX];	   // velocity of near faces
+	dVECTOR ncu[_3DENVTRAKMAX];	   // center of object relative to opos
+} _3DEnv;
+
+
+
+
+-------------------------------------------------------------------------
+IMPORTANT FILES:
+------------------
+	*** Basic Stuff ***
+
+vectors.c   -- Core vector math primitives.  Absolutely req'd for any of
+	the below to work.
+
+3Dmaster.c  -- The master include file for the engine.
+
+3Ddata.c    -- Data structures and initialization routines for them.
+
+3Ddefs.c    -- The core rendering routines.
+
+3Dext.c     -- Extensions to the core.  Shape generation and some useful
+	functions.
+
+3Dobjm.c    -- Object management utilities. 
+
+3Dnav.c     -- Stuctures for describing the ship's navigation and
+	perfomance, as well as routines for running them.
+
+	*** Other included files ***
+
+solexs.c    -- Setup, keyboard/mouse handling, and so forth.  This 
+	still does not have 3D in front of it becuase it is still not
+	generic enough.
+
+navcomd.c   -- Double precision orbit determination and structures.  As
+	of 1/20/2001 not yet part of the package, but soon.
+
+jetsim.c    -- A still very buggy aerodynamics module.  Not currently used.
+
+rammer.c    -- Bussard Ramjet acceleration functions and control 
+	structures.  Soon, soon.
+
+
+DESCRIPTIONS OF IMPORTANT FILES:
+----------------------------------
+VECTORS.C
+----------------
+	I am only including double precision desc. here.  Single is 
+very similar:  the basic structure is sVECTOR (rather than dVECTOR)
+and all the function names start with 's' rather than 'd'.
+
+---------------------------------------------------
+	The basic stucture:
+
+typedef struct dvect {
+	double vx;
+	double vy;
+	double vz;
+} dVECTOR;
+
+typedef dVECTOR *pdVECTOR;
+
+
+	General purpose functions:
+
+dVECTOR dvAdd(dVECTOR avect, dVECTOR bvect);
+		// vector addition
+
+dVECTOR dvScal(dVECTOR avect, double ascal);
+		// multiply a vector by a scalar 
+
+double dvDot(dVECTOR avect, dVECTOR bvect);
+		// dot product of two vector (order is not important)
+
+dVECTOR dvCross(dVECTOR avect, dVECTOR bvect);
+		// cross product of two vectors (order is VERY important)
+
+double dvMag(dVECTOR avect);
+		// scalar magnitude (i.e. length) of a vector
+
+dVECTOR dvRot(dVECTOR avect, char axis, short frot);
+		// rotates a vector 'frot' radians around 'x', 'y' or 'z' axis
+
+double dvAcos(dVECTOR avect, dVECTOR bvect, dVECTOR cvect);
+		// finds the quadrant corrected (360 degree) angle between two
+		// vectors, using cvect to define which way is 'up'.
+	
+
+	3D Engine specific functions:
+---------------------------------------------------
+dVECTOR dNorm(dVECTOR v1, dVECTOR v2, dVECTOR v3);
+	// Normal vector of a trianglar face defined by three vectors
+	//	NOTE: vectors must be CCW around the face in order for 
+	//	the normal to point in the right direction.
+
+dVECTOR dCenter(dVECTOR v1, dVECTOR v2, dVECTOR v3);
+	//Center (avg.) of three vectors
+
+dVECTOR dVecRot3D(dVECTOR tv, dVECTOR irv, dVECTOR jrv, double rota);
+	// Rotate vector in object frame (tv rota degrees around irv)
+
+dVECTOR dfvRot(dVECTOR resv, char axis, double frot);
+	//Double prec. modified version of dvRot
+	
+dVECTOR dvMidPt(dVECTOR s1, dVECTOR s2, int tflag, dVECTOR ctrv, 
+			int rflag, double rvar);
+	//	Calc. midpoint of s1, s2; optionally via center/radius
+	//	NOTE: if rflag is TRUE, will RANDOMIZE the midpoint
+	//	according to value of rvar.
+
+---------------------------------------------------
+
+
+3DDATA.C
+----------------
+	This file has all the global #defines, most of the core data
+structures, and the initialization routines for those structures.  It
+also includes the definition of the Z-sort function and the structure
+it uses.
+
+---------------------------------------------------
+Structures:
+------------
+
+typedef struct _3denv _3DEnv;  	  // 3D view window environment parameters
+	All the basic drawing parameters are in here, including shading
+modes, light levels, light locations, current location/vel/direction in
+space, orientation of view, location of proximate objects.  Multiple 
+instances of the environoment may be used (eventually) to allow you to
+switch views, locations, etc.  This environment operates under the 
+control of the _3DDisp structure.
+
+typedef struct _3ddisp _3DDisp;	  // The session display environment
+	This stucture keeps track of time, what viewing environments are
+running, the raw hardware handling stuff like video initilization and 
+updating, keyboard/mouse state, and (eventually) sound and joystick
+stuff.
+
+typedef struct _3dface _3DFace;   // Linked list unit for face data.
+	The .v array points to the three vertices (_3DVert's) that make
+up the corners of the face.  This stucture also has fields for the
+color of the face, how to draw the back of the face, and a pointer 
+back to the parent object.
+
+typedef struct _3dvert _3DVert;	  // Linked list unit for vertices
+	The .v field has coordinates for the vertex.  Also has a pointer 
+to a linked list of segments (_3DSeg's), i.e. other vertices this one 
+joins via faces.  Currently segments are not used for rendering but
+only for object generation, and so the list is NULLED to save memory. 
+
+typedef struct _3dseg _3DSeg;	// Linked list of segments.
+	Has fields for ptr to vertex this segment joins to, as well as a
+bookkeeping field that can point to another vertex.
+
+typedef struct _3dobjl _3DObjL;   // The main object structure.
+	All the objects are stored in a one-way linked list using this
+structure as a link.  This stucture also has pointers to the linked lists 
+of vertices and faces, as well as the 'extra stuff' stucture descibed
+below.  The head link also points at the last object in the list (all the 
+other links NULL this field).
+
+typedef struct _3dobjex _3DObjEX; // Extra stuff for objects in _3dobjl
+	Astronomy specific stuff one needs to update the position and
+state of objects.  Mass, orbit parameters, other things coming.
+
+typedef struct _xycrd
+{
+	int x;
+	int y;
+} _XYCrd;     // X-Y coords. for screen
+	X/Y coordinates for the screen.
+
+typedef struct _3dcol
+{
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
+} _3DCol;  	  // RGB structure
+	RGB mode independent color.
+
+	All the above have a typedef'd pointer whose name begins with
+'p' instead of '_' (i.e. 'typedef _3DObjL *p3DObjL).
+
+
+
+
+// ugghhh.  Documentation is boring... Back when I have more inspiration.
+// 

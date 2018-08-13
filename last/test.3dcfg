@@ -1,0 +1,84 @@
+#
+# test.3dcfg
+#		- example config file for 3dengine apps
+#
+DISPLAY
+VIDMODE 3
+EPTIME 2003.5
+FSKIP 4
+ISECS 1.0
+FRONT 0
+
+ENVIR
+EWIN 0
+SIZE MAX 
+UNITS EM
+# use Earth-Moon standard units:
+# distance (kms)
+# velocity (km/sec)
+# mass (Earth =	1.0)
+# time (sec)
+# accel (m/sec^2)
+OPOS NULL
+OVEL NULL
+ORIENT IJK
+# use standard IJK unit vectors for orientation
+# could say ORIENT OBJ,L,0 to orient toward center of local object 0
+LVB 35
+LVC 4
+VSCAL 1.0
+ENDEW
+
+OBJECTS
+LOCAL 0
+SCALE 1.0
+DMAX 9.7E15
+DMIN -1
+
+DEF 0
+CENTER 2000,0,0 
+VEL 0,0,0
+ROT 0,0,3600
+RX IUNIT
+RY JUNIT
+RZ KUNIT
+SPHERE 1000,4,0,0,0
+FCOLOR 128,128,128
+NOBACK
+REFL 0.99
+LUMIN 0
+NOLITE
+XDAT
+MASS 0.15
+OMASS 1
+ENDDEF
+
+DEF 1
+CENTER 2000, -2000, 1000
+VEL 0,0,0
+ROT 0,60,0
+RX IUNIT
+RY JUNIT
+RZ KUNIT
+VERT 0,0,0,100
+VERT 1,0,0,-100
+VERT 2,100,0,0
+VERT 3,0,100,0
+VERT 4,-100,0,0 
+VERT 5,0,-100,0 
+FACE 0,0,2,3,128,128,128,0
+FACE 1,0,3,4,128,128,128,0
+FACE 2,0,4,5,128,128,128,0 
+FACE 3,0,5,2,128,128,128,0
+FACE 4,1,3,2,128,128,128,0
+FACE 5,1,4,3,128,128,128,0
+FACE 6,1,5,4,128,128,128,0
+FACE 7,1,2,5,128,128,128,0  
+REFL 0.99
+LUMIN 0
+NOLITE
+XDAT
+MASS 0.05
+OMASS 0
+ENDDEF
+ENDOBJ

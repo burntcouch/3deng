@@ -1,0 +1,42 @@
+//
+// README -- Pat's Science Fiction 3DEngine
+// v0.46 
+// Engine docs in 3DEngine.doc
+//
+// App specific documentation:
+//
+//  Solar System Explorer - solex.doc
+//
+//  Svgalib demos are included for testing your
+//	display before trying my stuff out.  Sorry, I did NOT
+//	include docs for svgalib itself.  This IS a work in progress
+//	and if you want them THAT bad you should already have them
+//	since this dist is no good to you without the appropriate
+//	libraries, anyway. 
+//  To obtain the latest version of svgalib, go to www.svgalib.org
+//	or send me an e-mail and ask me for it.  I am currently using
+//	version 1.4.3, which runs about 450K or so.  There are some
+//	'gotchas' when installing this package so be sure to read the
+//	docs FIRST before you install it.
+//  In any case...  Run 'vgatest' and choose an appropriate mode. If 
+//	any 32K modes show up (i.e. G640x480x32K or higher) you can
+//	probably run my demos.  Below are the ones I am currently using
+//	with my demo progams: 
+// 
+//	     vgatest #	 		demo # 
+//		17 - G640x480x32K -         0 e.g. ('./solex4 0')
+//		18 - G640x480x64K -    "    1
+//		19 - G640x480x16M -    "    2
+//		20 - G800x600x32K -    "    3
+//		21 - G800x600x64K -    "    4
+//		22 - G800x600x16M -    "    5
+//		23 - G1024x768x32K -    "   6
+//		24 - G1024x768x64K -    "   7
+//		25 - G1024x768x16M -    "   8
+//
+//
+//  Engine bug info and detailed functional descriptions:  3DEngine.doc
+//  The Solar system explorer IV demo instructions      :  solex4.doc
+//
+//	3/5/2002 - Pat Struthers
+//

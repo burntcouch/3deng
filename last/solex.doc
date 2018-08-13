@@ -1,0 +1,237 @@
+
+1/18/2001 - Pat Struthers
+
+revised 3/6/2002 - minor changes in controls
+
+**************
+Solar System Explorer
+**************
+
+	Solex3/4 is a demo of my -svgalib-based 3D engine.  The basic goal of 
+the final version is to navigate to and land on an asteroid with your ship
+as both move in orbits through the Earth/Moon/Sun system.  A number of 
+navigational aids are provided to make this easier.  These are needed 1) because
+the universe is a very big place and 2) it is impossible to seat-of-the-pants a
+ship in a complex (or even a simple) gravitational environment.  Believe me,
+I have certainly tried.
+	The Earth/Moon/Sun models are accurate as far as the orbits, masses,
+and size, but I have as yet made no attempt to duplicate the authentic 
+terrain features.  I went with realistic colors and detail and left it at that.
+
+Command Line Options:
+----------------------
+	So far all you can do is choose video modes, as follows:
+
+	./solex4 N  
+
+	where: N =
+		-1 - 512x480x32K
+		-2 - 512x480x64K
+		0 - 640x480x32K  (default)
+		1 - 640x480x64K
+		2 - 640x480x16M
+		3 - 800x600x32K
+		4 - 800x600x64K
+		5 - 800x600x16M
+		6 - 1024x768x32K
+		7 - 1024x768x64K
+		8 - 1024x768x16M
+
+	If your screen is trashed, just hit 'q' and then any other key and
+		the program will quit.  No harm done. 
+
+
+Keyboard / Mouse Command Summary:
+----------------------------------
+Navigation:
+	0 - 9 : Engine power setting = digit^2/10 m/sec*sec ( 0 - .81 gees)
+	i : 	Accelerate 'up' for duration of current 'time-step'
+	m :	Accelerate 'down' for duration of current 'time-step'
+	j :	Accelerate 'left'
+	k :	Accelerate 'right'
+	a :	Accelerate 'forward'
+	z :	Accelerate 'reverse'
+	c :	Go down one view (0- no lock, 1- gunsight, 2- vvect, 3+ obj)
+	v :	Go up one view
+	f :	Go to view 0
+	LEFT-CLICK:	Center view on mouse pointer (only works for view 0)
+	RIGHT-CLICK :	Select gunsight target (RED)
+	d :	Select/deselect gunsighted target as docking target (GREEN)
+	n :	Toggle 'near faces' marking (BLUE)
+
+3D Engine:
+	e :	Solid drawing mode ('solid' or 'shaded' or ???)
+	r :	Shading mode ('radar' or 'lighted')
+	w :	Wireframe drawing mode
+	< :	Increment frame skip ( 1 - 7 frames/step)
+	> :	Decrement frame skip
+	. :	Decrement 'time step' by 1.5 (.001 to 20 secs)
+	, :	Increment 'time step' by 1.5
+	[ :	Increment 'light gain' (brighter)  SHIFT-,
+	] :	Decrement 'light gain' (dimmer) SHIFT-.
+	spc :	Pause
+	q :	Quit
+	; :	Zoom in (increase screen scale)
+	' :	Zoom out 
+
+
+3D Engine Controls:
+-------------------------------
+	The default drawing mode is wireframe, mainly because I like things
+to start a little faster when I'm testing (although I really haven't seen
+much difference).  If you want to get back to wireframe mode from other 
+modes hit ( W ).
+	The solid drawing modes (solid/shaded) are chosen by hitting ( E ).
+( E ) toggles between solid and shaded modes and has an extra one in there
+that may be for future development (shadowing and reflections?).  The
+default shading mode is the 'lighted' mode.
+	To toggle between the shaded modes use ( R ).  The other mode 
+could be called 'radar' mode, although the colors of the objects are still
+apparent.  Since my objects are generally either color-coded for height or
+else all one color, this is actually a pretty good name for it.
+	You can also adjust the 'light gain' when you are in lighted mode
+by using ( [ ) and ( ] ).  The defaults work pretty good for the current
+default environoment but it could be pretty far off for other situations.
+(Remember to use the SHIFT key to make these work!  The UNSHIFTED keys
+increment and decrement the 'time step'!).
+	Lastly, you can change the screen scale with ( ; / ' ).  This
+allows you to magnify very distant objects or widens your view so
+that you can see more of a very close object.  At the widest view setting
+this results in EXTREME distortion (sort of cool looking, actually) 
+since I use a polar-coordinate system to convert my view-vector to 
+screen coordinates, and the highest setting actually is a near 
+panoramic view (you can look behind yourself!).
+
+Timing Controls:
+----------------
+	Since the whole idea behind this project is to accurately sim.
+astronomical navigation and environments, TIME is obviously critical.
+The engine currently 'auto-adjusts' the internal 'time step' to match
+to selected 'real-time' ratio.  THis is necessary if you want to 
+simulation to run in real-time no matter how fast your host machine may
+be, and right now the sync is not perfect, but close enough to be
+usable.
+	( , ) and ( . ) incr/decr the real-time ratio.  The default is 
+1 second = 1 second.  Each i/d changes the ratio by a factor of about
+1.5, with a range of .001 seconds up to 30 seconds.  The upper limit
+will have to be increased once this sim. starts dealing with inter-
+planetary and interstellar distances.  Right now it works well enough
+for the E/M/S system, if you don't get too far from the Earth anyway.
+	Another timing control adjusts the rate at which the screen 
+is updated vs. the 'time step'.  This is done with ( < / > ), and
+the range is 1 - 7 steps per screen update, with a default of 3.
+Right now it is best to set this to 1 so that the mouse and keyboard
+will be responsive enough.  This is a majorly irritating bug but I'm
+stuck with it until I speed up the engine a bit and finish modularizing
+the system.
+	( <spacebar> ) pauses everything (debugging uses, mostly) and
+( Q ) quits.
+
+Navigational Controls:
+-----------------------
+	The view selection keys ( C/V & F ) move the 'external cameras' to 
+follow a given object or target area.  ( C/V ) incr/decr the view, ( F )
+sets it back to 0 if you get lost up there looking at the objects.
+
+	View 0 (the default) is an unlocked view that you can use with
+ the mouse to rotate the view arbitrarily ( LEFT-CLICK ).
+	View 1 is the 'gunsight' view.  ( RIGHT-CLICK ) on an area of the
+objact that you wish to follow or mark for docking.  If you hit ( D )
+when an area is gunsighted the color will change to green and the gunsight
+is released to mark another object.  More on docking functions below.
+	View 2 is the 'velocity-vector' view.  It rotates the view so that
+one is looking in the same direction the ship is moving.  Right now this
+is working but the frame of ref. is *absolute*.  
+	What we really want is v. relative to some body. Since the ship is 
+generally orbiting around something (the Earth, in this case) and THAT 
+object is also often orbiting something, the absolute velocity can be
+rather high and in a somewhat peculiar direction (certainly not what
+you would intuitively expect.  Believe me now, throw your intuition out the
+window if you ever want to learn space navigation.).
+	View 3 and up center on each defined object, allowing you to
+quickly see what objects are where.  If you hit ( N ) you can toggle a
+blue triangle (w/ range and vel.) on the area of each object closest
+to the ship.
+	I have yet to add a 'docking target' view, more because I forgot
+than anything else, but it will probably be inserted between the 
+gunsight view and the v-vector view.
+
+	MOVING THE SHIP 
+		-  Actually, accelerate it from its current orbit.
+	REMEMBER, everything is moving ALL the time.  This is one of the things
+that makes orbital navigation a real bitch.
+	To set the engine power hit a number key ( 0-9 ). The actual accel.
+is about equal to < digit^2 / 10 > m/sec*sec, or from 0 to .81 gees.
+This allows enough fine control to facilitate docking, but at the same 
+time give you a big kick if you need it.  
+	NOTE: In case you found out the hard way, 0.81 gee is NOT enough to
+allow you to land on the Earth!  You need at least 1.0 gee (and probably
+more, if you want to do anything but control your fall) to land there.
+Since I am still working on the atmospheric reentry issue this is just
+as well.  Try the Moon out if you are feeling ambitious, and be thankful
+I don't keep track of fuel usage yet.
+	To actally start a burn, you need to select a direction (and
+actually the duration of the burn, too). Use ( I/M ) to move 'up' and
+'down', ( J/K ) for 'left' and 'right', ( A/Z ) for 'forward' and
+'back'.  ALL these directions are relative to your current view (which
+may not be the way you want to go, except in close manuevering/docking
+situations).
+	The burn duration in seconds depends on your current 'time step'.
+See above for details on how to change the 'time step'.  Basically
+your total change in vel. = ( engine power ) * ( time step).  Watch this 
+carefully if you are using high values (10-30 secs) of 'time-step', as
+this can result in a VERY large change in your orbit, possibly resulting
+in either escape velocity or de-orbiting into a collision (OOPS).
+	There will soon be additional display features for docking, 
+automatic piloting to/from and between way-points, and so on.  Right now
+you will have to do everything manually.
+
+PLAYING THE GAME:
+------------------
+	The basic goal, as stated above, is to attempt to dock on the 
+asteroid.  Use the gunsighting and docking target displays to measure 
+distance and relative velocity, use the engine controls to manuever the
+ship there, and you're DONE.  Sound easy?  Right now it is, becuase I
+put the asteroid only 10km 'Y-ward' (left) about 1km 'Z-ward' (up) in
+the same orbit as your ship.  Just try it when the thing is in a polar
+orbit.  Just try to FIND it!
+	But that it is what the object view selector is for...  I think
+in the current version of solex3, view 6 will center on the asteroid, 
+even if it is behind something else.  It may be so far away (it is
+only a klick wide, and if it's on the other side of the earth..) that
+you will not actually have an image (although 'radar' view will work
+better for this than realistic lighting).
+	Once you find the object you want to get to, use the screen
+scale controls to zoom in, gunsight the place you want to land on, and
+hit ( D ) to mark it in green for docking.  Then manuever as close as
+possible in as little time as possible.
+	DON'T get going to FAST!  Pay careful attention to your initial
+range and speed and try to accelerate as close to exactly halfway to your
+target and then decelerate the other half.  This will NOT work out exactly
+as you are in a fairly intense gravitational field, but for close 
+quarters (ranges up to about 1000km and velocities below 1 km/sec) it
+is a good method.  For more complex situations a more trial and error
+approach is warranted.
+	The asteroid currently doesn't have a non-zero mass, so all
+you have to do is (somehow) zero-out the range/speed simultaneously.  At
+that poing you should orbit along with the rock.  Be thankful I didn't
+give it any net rotation.
+
+WHAT COMES NEXT...
+	I will soon add a realistic background (actual STARS), which should
+aid navigation a bit.  This is to test some new engine features, mainly.
+	I will be completely changing the control system by adding in a pull
+down menu system + dialog boxes.  No more clunky keyboard commands that you 
+can't remember, and it will be easy to add more features (including ones I
+need for debugging).
+
+	Version 0.5 will be something else again:  a real-time simulation of
+the Jovian moon system: a space station orbiting around Ganymede, a whole
+bunch of asteroids at both trojan points, plus all the other planets.  This
+will be the test bed for the various ship designs and simulations I am 
+working on, as well as more realistic orbital calc. and navigation, shape
+rendering, and general engine optimization.
+
+	- MORE WHEN I KNOW MORE!  GOOD LUCK!
+			- Pat
+ 

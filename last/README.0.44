@@ -1,0 +1,31 @@
+//
+// README -- Pat's Science Fiction 3DEngine
+// v0.44 
+// Engine docs in 3DEngine.doc
+//
+// App specific documentation:
+//
+//  Solar System Explorer - solex.doc
+//
+//  Svgalib demos are included for testing your
+//	display before trying my stuff out.  Sorry, I did NOT
+//	include docs for svgalib itself.  This IS a work in progress
+//	and if you want them THAT bad you should already have them
+//	since this dist is no good to you without the appropriate
+//	libraries, anyway. 
+//  Speaking of which, you should have vga.h/vgagl.h/vgamouse.h etc.
+//	in your include directory.  I WILL soon put some info in here
+//	on how to obtain your own copy of svgalib, but so far I haven't
+//	bothered to update MY version so I am by no means an expert on
+//	finding and installing it.  Ah well.
+//
+//  In any case...  Run 'vgatest' and choose an appropriate mode. If 
+//	any 32K modes show up (i.e. G640x480x32K or higher) you can
+//	probably run my demos.  I have also included 'vga_reset', which
+//	you may or may not need to get the auto-detect of you card to
+//	work right.
+//
+//  For bug info..  see 3DEngine.doc
+//
+//	1/19/2001 - Pat Struthers
+//

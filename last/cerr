@@ -1,0 +1,102 @@
+In file included from solex41.c:28:
+solexs.c: In function `S3D_ChgView':
+solexs.c:142: warning: passing arg 1 of `NearFace3D' from incompatible pointer type
+In file included from solex41.c:28:
+solexs.c: In function `S3D_DoMouse':
+solexs.c:361: warning: passing arg 1 of `RayFace3D' from incompatible pointer type
+solex41.c: In function `main':
+solex41.c:62: `p3DObjR' undeclared (first use in this function)
+solex41.c:62: (Each undeclared identifier is reported only once
+solex41.c:62: for each function it appears in.)
+solex41.c:62: parse error before "objr"
+solex41.c:112: warning: assignment makes pointer from integer without a cast
+solex41.c:112: warning: assignment makes pointer from integer without a cast
+solex41.c:113: warning: assignment makes pointer from integer without a cast
+solex41.c:113: warning: assignment makes pointer from integer without a cast
+solex41.c:118: warning: assignment makes pointer from integer without a cast
+solex41.c:118: warning: assignment makes pointer from integer without a cast
+solex41.c:119: warning: assignment makes pointer from integer without a cast
+solex41.c:124: structure has no member named `nexto'
+solex41.c:130: warning: passing arg 1 of `SphereObj3D' from incompatible pointer type
+solex41.c:130: warning: assignment makes integer from pointer without a cast
+solex41.c:131: `objr' undeclared (first use in this function)
+solex41.c:131: structure has no member named `odat'
+solex41.c:133: subscripted value is neither array nor pointer
+solex41.c:134: subscripted value is neither array nor pointer
+solex41.c:135: structure has no member named `riv'
+solex41.c:135: structure has no member named `rjv'
+solex41.c:135: structure has no member named `rkv'
+solex41.c:136: structure has no member named `rkv'
+solex41.c:136: structure has no member named `rjv'
+solex41.c:136: structure has no member named `rkv'
+solex41.c:137: structure has no member named `riv'
+solex41.c:137: structure has no member named `rkv'
+solex41.c:138: subscripted value is neither array nor pointer
+solex41.c:173: warning: passing arg 1 of `SphereObj3D' from incompatible pointer type
+solex41.c:173: warning: assignment makes integer from pointer without a cast
+solex41.c:174: structure has no member named `odat'
+solex41.c:176: subscripted value is neither array nor pointer
+solex41.c:177: subscripted value is neither array nor pointer
+solex41.c:178: structure has no member named `riv'
+solex41.c:178: structure has no member named `rjv'
+solex41.c:178: structure has no member named `rkv'
+solex41.c:179: structure has no member named `rkv'
+solex41.c:179: structure has no member named `rjv'
+solex41.c:179: structure has no member named `rkv'
+solex41.c:180: structure has no member named `riv'
+solex41.c:180: structure has no member named `rkv'
+solex41.c:181: subscripted value is neither array nor pointer
+solex41.c:201: warning: passing arg 1 of `SphereObj3D' from incompatible pointer type
+solex41.c:201: warning: assignment makes integer from pointer without a cast
+solex41.c:202: subscripted value is neither array nor pointer
+solex41.c:203: subscripted value is neither array nor pointer
+solex41.c:204: subscripted value is neither array nor pointer
+solex41.c:205: subscripted value is neither array nor pointer
+solex41.c:206: subscripted value is neither array nor pointer
+solex41.c:207: subscripted value is neither array nor pointer
+solex41.c:214: warning: passing arg 1 of `SphereObj3D' from incompatible pointer type
+solex41.c:214: warning: assignment makes integer from pointer without a cast
+solex41.c:215: subscripted value is neither array nor pointer
+solex41.c:216: subscripted value is neither array nor pointer
+solex41.c:216: subscripted value is neither array nor pointer
+solex41.c:217: subscripted value is neither array nor pointer
+solex41.c:218: subscripted value is neither array nor pointer
+solex41.c:237: warning: passing arg 1 of `DegenObj3D' from incompatible pointer type
+solex41.c:237: warning: assignment makes integer from pointer without a cast
+solex41.c:238: subscripted value is neither array nor pointer
+solex41.c:239: subscripted value is neither array nor pointer
+solex41.c:240: subscripted value is neither array nor pointer
+solex41.c:246: incompatible types in assignment
+solex41.c:247: incompatible types in assignment
+solex41.c:248: incompatible types in assignment
+solex41.c:249: incompatible types in assignment
+solex41.c:251: incompatible types in assignment
+solex41.c:254: warning: assignment makes pointer from integer without a cast
+solex41.c:254: warning: assignment makes pointer from integer without a cast
+solex41.c:254: warning: assignment makes pointer from integer without a cast
+solex41.c:256: incompatible types in assignment
+solex41.c:259: warning: assignment makes pointer from integer without a cast
+solex41.c:259: warning: assignment makes pointer from integer without a cast
+solex41.c:261: incompatible types in assignment
+solex41.c:264: warning: assignment makes pointer from integer without a cast
+solex41.c:266: incompatible types in assignment
+solex41.c:269: warning: assignment makes pointer from integer without a cast
+solex41.c:269: warning: assignment makes pointer from integer without a cast
+solex41.c:270: warning: assignment makes pointer from integer without a cast
+solex41.c:352: warning: passing arg 2 of `DrawWire3D' from incompatible pointer type
+solex41.c:354: warning: passing arg 2 of `DrawZS3D' from incompatible pointer type
+solex41.c:360: too many arguments to function `N3D_DrawNear'
+solex41.c:363: warning: passing arg 3 of `N3D_DrawGunS' from incompatible pointer type
+solex41.c:363: too many arguments to function `N3D_DrawGunS'
+solex41.c:366: warning: passing arg 3 of `N3D_DrawDock' from incompatible pointer type
+solex41.c:366: too many arguments to function `N3D_DrawDock'
+solex41.c:412: warning: passing arg 1 of `sGravOx' from incompatible pointer type
+solex41.c:414: warning: passing arg 1 of `N3D_Grav' from incompatible pointer type
+solex41.c:414: incompatible type for argument 2 of `N3D_Grav'
+solex41.c:414: too many arguments to function `N3D_Grav'
+solex41.c:418: warning: passing arg 1 of `ObjMove' from incompatible pointer type
+solex41.c:427: warning: passing arg 1 of `N3D_UpdGunS' from incompatible pointer type
+solex41.c:427: too many arguments to function `N3D_UpdGunS'
+solex41.c:460: structure has no member named `nexto'
+solex41.c:464: structure has no member named `nexto'
+make: *** [solex41.o] Error 1
