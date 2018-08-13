@@ -8,6 +8,9 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 
+// gotcha #2 -- add this line to keep from having to use 'std::cout' below instead of just 'cout'
+using namespace std;
+
 // prototypes  - three different squares, and the compiler knows which one to use based on proto
 //
 int square(int i) ;
@@ -37,9 +40,7 @@ int main()
 	f = square(f);   //calls square for floats
 	d = square(d);   //calls square for doubles
 	
-// gotcha #2: 'std::cout' instead of just 'cout'
-	
-	std::cout << i << "\n" << f << "\n" << d << "\n\n";
+	cout << i << "\n" << f << "\n" << d << "\n\n";
 
 	return 0;
 }
