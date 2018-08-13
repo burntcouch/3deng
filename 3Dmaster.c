@@ -28,7 +28,7 @@
 #define PI 3.1415926535898
 #endif
 
-#include "mylib/vectors.c"
+#include "vectors.c"
 #include "3ddata.c"
 #include "3ddefs.c"
 #include "3dobjm.c"
