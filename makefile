@@ -2,7 +2,7 @@
 #  --- working makefile
 #
 3DCURRVER = 0.501
-SDLLIBS = -lsdl -lm
+SDLLIBS = -lSDL2 -lm
 
 ifdef 3DVER
 	3DCURRVER := $(3DVER)
@@ -27,11 +27,8 @@ aback: *.c *.cpp *.h *.doc README* makefile
 	cp README* ./v$(3DCURRVER); \
 	cp makefile ./v$(3DCURRVER)
 
-sdlprog: sdlprog.o
-	g++ -o sdlprog sdlprog.o $(SDLLIBS)
-	
-sdlprog.o: sdlprog.cpp
-	g++ -O3 -c sdlprog.cpp
+sdlprog: sdlprog.cpp
+	g++ sdlprog.cpp -w $(SDLLIBS) -o sdlprog
 	
 solex42: solex42.o 
 	gcc -o solex42 solex42.o -lvgagl -lvga -lm
