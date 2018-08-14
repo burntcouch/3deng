@@ -1,5 +1,5 @@
 //
-// 3dsdl test program
+// 3dsdl test program template
 //
 
 #include <math.h>
@@ -8,39 +8,29 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 
+#include "vectors.cpp"   // to test c++ reworking of vectors.c to .cpp
+
 // gotcha #2 -- add this line to keep from having to use 'std::cout' below instead of just 'cout'
 using namespace std;
 
-// prototypes  - three different squares, and the compiler knows which one to use based on proto
-//
-int square(int i) ;
-float square(float f);
-double square(double d) ;
+int main(void);
 
-// definitions
-int square(int i) 
+int main(void) 
 {
-	return i*i;
-}
-float square(float f) 
-{
-	return f*f;
-}
-double square(double d) 
-{
-	return d*d;
-}
+			// vector tests
 
-int main() 
-{
-	int    i = 2;
-	float  f = 3.0;
-	double d = 4.0;
-	i = square(i);   //calls square for ints
-	f = square(f);   //calls square for floats
-	d = square(d);   //calls square for doubles
-	
-	cout << i << "\n" << f << "\n" << d << "\n\n";
+	dVECTOR v1, v2, v3;
+	double vmag;
 
+	v2.vx = 1.0; v2.vy = 2.0; v2.vz = 3.0;
+	v3.vx = -0.5; v3.vy = 1.5; v3.vz = -2.5;
+
+	v1 = vAdd(v2, v3);
+	vmag = vMag(v1);
+
+	cout << "V2     : " << v2.vx << " " << v2.vy << " " << v2.vz << "\n\n";
+	cout << "V3     : " << v3.vx << " " << v3.vy << " " << v3.vz << "\n\n";
+	cout << "V2 + V3: " << v1.vx << " " << v1.vy << " " << v1.vz << "\n\n";
+	cout << "vmag = " << vmag << "\n\n";
 	return 0;
 }

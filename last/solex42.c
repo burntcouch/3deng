@@ -306,7 +306,7 @@ int main(int argc, char *argv[]) {
 	t2 = 0;
 
 
-		printf("All init OK\n");
+	printf("All init OK\n");
 
 	while (1) {
 		dumi = 255;

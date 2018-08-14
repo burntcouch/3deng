@@ -38,7 +38,7 @@ inline float vDot(sVECTOR avect, sVECTOR bvect)
 }
 
 /*vector cross product*/
-inline sVECTOR sCross(sVECTOR avect, sVECTOR bvect)
+inline sVECTOR vCross(sVECTOR avect, sVECTOR bvect)
 {
    sVECTOR tempvect;
    tempvect.vx = avect.vy * bvect.vz - avect.vz * bvect.vy;
@@ -401,7 +401,7 @@ dVECTOR vRot3D(dVECTOR tv, dVECTOR irv, dVECTOR jrv, double rota) {
 }
 
 
-dVECTOR dvMidPt(dVECTOR s1, dVECTOR s2, int tflag, dVECTOR ctrv,
+dVECTOR vMidPt(dVECTOR s1, dVECTOR s2, int tflag, dVECTOR ctrv,
 			int rflag, double rvar) {
 		// NOTE: rvar should be the proportion by which
 		//   you wish to vary the radius (or whatever)
@@ -410,12 +410,12 @@ dVECTOR dvMidPt(dVECTOR s1, dVECTOR s2, int tflag, dVECTOR ctrv,
 	double ls1, ls2, lr;
 	dVECTOR vhat, vt1, vt2;
 
-	vhat = vScal(dvAdd(s1, s2), 0.5);
+	vhat = vScal(vAdd(s1, s2), 0.5);
 
 	//if a centered radius midpoint is wanted...
 	if (tflag) {
- 		ls1 = vMag(dvAdd(s1, dvScal(ctrv, -1)));
-		ls2 = vMag(dvAdd(s2, dvScal(ctrv, -1)));
+ 		ls1 = vMag(vAdd(s1, vScal(ctrv, -1)));
+		ls2 = vMag(vAdd(s2, vScal(ctrv, -1)));
 		lr = (ls1 + ls2) / 2;
 		if (rflag) {
 			lr += (lr*rvar) * ((double) rand() / RAND_MAX - 0.5);
