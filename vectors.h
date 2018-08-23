@@ -1,5 +1,5 @@
 //
-// VECTORS.C - reworked for Linux 11/13/2000
+// VECTORS.H - reworked for Linux 11/13/2000
 // Definition of single and double prec. vector operations
 // May soon include matrix operations also
 // Pat Struthers    5/16/97

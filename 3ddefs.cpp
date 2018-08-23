@@ -1,7 +1,7 @@
 //
 // Pat's 3d definitions
 //
-//  3ddefs.c v0.4LL (4/6/2003)
+//  3ddefs.cpp v0.50x (8/14/2018)
 //
 // Started 12/21/00
 //
@@ -19,97 +19,11 @@
 // 5/6/2003 - Newer version of memory allocation, etc. 
 // 5/10/03  - Still working on above
 // 5/19/03  - All routines working except PartObj
+//
+// 8/14/18 - beginning of conversion to C++ and objects
+//
 
-#ifndef _3DDEFS
-#define _3DDEFS 1
-
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <vga.h>
-#include <vgagl.h>
-
-#ifndef _VECTORS
-#include "mylib/vectors.c"
-#endif
-
-#ifndef PI
-#define PI 3.1415926535898
-#endif
-
-#define _ZSGROW 8192
-
-// important structures and macros...
-
-#ifndef _3DDATA
-#include "3ddata.c"
-#endif
-
-
-// FUNCTION PROTOTYPES 
-
-	// break integer color into rgb
-_3DCol GetRGB(long int lcol, int vcol);
-
-	// rgb to long int
-long int PackRGB(_3DCol prgb, int vcol);
-
-	// Get a unit vector from screen coordinates...
-dVECTOR ScrUnit3D(p3DEnv tenv, _XYCrd tgt); 
-
-	// Find out if a ray intersects a face
-int FInter3D(dVECTOR v1, dVECTOR v2, dVECTOR v3, dVECTOR lv,
-	dVECTOR vv, double *ti, dVECTOR *pv); 
-
-	// Alternate to above, polar coordinates
-_XYCrd Screen3Dr(p3DEnv tenv, dVECTOR vvert);
-
-	// Fill a triangle with tcol (uses gl_line())
-int tricolor3D(_XYCrd c1, _XYCrd c2, _XYCrd c3, long int tcol, int wf);
-
-	// Calc area of triangle on screen in pixels
-long int triarea3D(_XYCrd c1, _XYCrd c2, _XYCrd c3);
- 
-	// Do lighted shading - unlit faces
-_3DCol FcShade3D(_3DCol fcol, p3DEnv senv, dVECTOR norm, dVECTOR ctr,
-			 float refl);
- 
-	// Do lighted shading - luminunous faces
-_3DCol LtShade3D(_3DCol fcol, p3DEnv senv, dVECTOR norm, dVECTOR ctr,
-			 float lum); 
-
-	// Find a face.., return -1 if no intercept, otherwise face#
-void RayFace3D(p3DObjA wobj, dVECTOR pv, dVECTOR vv, 
-			p3DFace fp, p3DObjL op, double *ETA);
-
-	// Get nearest faces of objects and put in env.
-int NearFace3D(p3DObjA wobj, p3DEnv wenv);
-
-	// Draw wireframes of objects
-int DrawWire3D(p3DEnv tenv, p3DObjA tobj);
-
-	// Draw wirefram of one face
-_XYCrd DrawFW3D(p3DEnv wenv, p3DFace fn);
-
-	// Draw zsorted and shaded objects
-int DrawZS3D(p3DEnv tenv, p3DObjA tobj);
-
-	// Renormalize view unit vectors (needed after a rotation)
-void Renorm3D(p3DEnv oenv);
-
-	// Partition an object into 4 faces/per face
-int PartObj3D(p3DObjL pobj, int plvl, int tflag, 
-			int rflag, double rvar, double rv2);
-
-	// Move all objects in structure one time step and update
-void ObjMove(p3DObjA mobj, p3DEnv menv);
-
-	// Return velocity of face 
-dVECTOR FaceVel3D(p3DObjL obj, p3DFace fc);
-
-	// Rotate all objects
-void ObjRot(p3DObjA mobj, double dt); 
-
+#include "3ddefs.h"   /// mmm-hmmmm
 
 // FUNCTION DEFINITIONS 
 
@@ -165,12 +79,12 @@ void Renorm3D(p3DEnv oenv) {
 	double ffa;
 	dVECTOR fva;
 	
-	ffa = dvMag(oenv->oiv);
-	oenv->oiv = dvScal(oenv->oiv, 1 / ffa);
-	fva = dvCross(oenv->oiv, oenv->ojv);
-	ffa = dvMag(fva);
-	oenv->okv = dvScal(fva, 1 / ffa);
-	oenv->ojv = dvCross(oenv->okv, oenv->oiv);
+	ffa = vMag(oenv->oiv);
+	oenv->oiv = vScal(oenv->oiv, 1 / ffa);
+	fva = vCross(oenv->oiv, oenv->ojv);
+	ffa = vMag(fva);
+	oenv->okv = vScal(fva, 1 / ffa);
+	oenv->ojv = vCross(oenv->okv, oenv->oiv);
 }
 
 dVECTOR FaceVel3D(p3DObjL obj, p3DFace fc) {
@@ -183,14 +97,14 @@ dVECTOR FaceVel3D(p3DObjL obj, p3DFace fc) {
 	ta = fc->v[0]->v;
 	tb = fc->v[1]->v;
 	tc = fc->v[2]->v;
-	cfv = dvAdd(dCenter(ta, tb, tc), dvScal(cv, -1));
+	cfv = vAdd(vCenter(ta, tb, tc), vScal(cv, -1));
 
-	rv.vx = dvDot(cfv, obj->rox[0]);
-	rv.vy = dvDot(cfv, obj->rox[1]);
-	rv.vz = dvDot(cfv, obj->rox[2]);
-	fx = dvDot(fv, obj->rox[0]);
-	fy = dvDot(fv, obj->rox[1]);
-	fz = dvDot(fv, obj->rox[2]);
+	rv.vx = vDot(cfv, obj->rox[0]);
+	rv.vy = vDot(cfv, obj->rox[1]);
+	rv.vz = vDot(cfv, obj->rox[2]);
+	fx = vDot(fv, obj->rox[0]);
+	fy = vDot(fv, obj->rox[1]);
+	fz = vDot(fv, obj->rox[2]);
 
 	if (fabs(obj->rot.vx) > 0) {
 		fg = obj->rot.vx * PI / 180;
@@ -230,23 +144,23 @@ void ObjRot(p3DObjA mobj, double dt) {
 		fv = objr->center;
 		tvrt = objr->v;
 		while ((tvrt != NULL) && (objr->df != 2)) {
-			fw = dvAdd(tvrt->v, dvScal(fv,-1));
+			fw = vAdd(tvrt->v, vScal(fv,-1));
 			if (fabs(objr->rot.vx) > 0) {
 				fg = objr->rot.vx * dt;
-				fw = dVecRot3D(fw, objr->rox[0], 
+				fw = vRot3D(fw, objr->rox[0], 
 					objr->rox[1], fg);	
 			}	
 			if (fabs(objr->rot.vy) > 0) {
 				fg = objr->rot.vy * dt;
-				fw = dVecRot3D(fw, objr->rox[1], 
+				fw = vRot3D(fw, objr->rox[1], 
 					objr->rox[2], fg);	
 			}	
 			if (fabs(objr->rot.vz) > 0) {
 				fg = objr->rot.vz * dt;
-				fw = dVecRot3D(fw, objr->rox[2], 
+				fw = vRot3D(fw, objr->rox[2], 
 					objr->rox[0], fg);	
 			}	
-			tvrt->v = dvAdd(fw, fv);
+			tvrt->v = vAdd(fw, fv);
 			tvrt = tvrt->nx;
 		}
 		objr = objr->nx;
@@ -254,7 +168,7 @@ void ObjRot(p3DObjA mobj, double dt) {
 	return;	
 } 
 
-
+	// Find out if a ray intersects a face
 int FInter3D(dVECTOR v1, dVECTOR v2, dVECTOR v3, dVECTOR lv,
 	dVECTOR vv, double *ti, dVECTOR *pv) {
 	
@@ -265,38 +179,38 @@ int FInter3D(dVECTOR v1, dVECTOR v2, dVECTOR v3, dVECTOR lv,
 	int res;
 
 	*pv = dNULLV;
-	nv = dNorm(v1, v3, v2);
+	nv = vNorm(v1, v3, v2);
 
-	lz = dvDot(nv, dvAdd(lv, dvScal(v1, -1)));
-	vz = dvDot(nv, vv);
+	lz = vDot(nv, vAdd(lv, vScal(v1, -1)));
+	vz = vDot(nv, vv);
 
 	*ti = -lz / vz;
 	while (1) {
 		if (*ti < 0) { res = 0; break;}
 
-		*pv = dvAdd(lv, dvScal(vv, *ti));
-		bv = dvAdd(v2, dvScal(v1, -1));
-		rb = dvMag(bv);
-		cv = dvAdd(v3, dvScal(v1, -1));
-		rc = dvMag(cv);
-		ppv = dvAdd(*pv, dvScal(v1, -1));
-		rp = dvMag(ppv);
-		bh = dvScal(bv, 1 / dvMag(bv));
-		ch = dvScal(cv, 1 / dvMag(cv));
-		ph = dvScal(ppv, 1 / dvMag(ppv));
-		dcb = acos(dvDot(bh, ch));
-		dpb = acos(dvDot(ph, bh));
-		dpc = acos(dvDot(ph, ch));
+		*pv = vAdd(lv, vScal(vv, *ti));
+		bv = vAdd(v2, vScal(v1, -1));
+		rb = vMag(bv);
+		cv = vAdd(v3, vScal(v1, -1));
+		rc = vMag(cv);
+		ppv = vAdd(*pv, vScal(v1, -1));
+		rp = vMag(ppv);
+		bh = vScal(bv, 1 / vMag(bv));
+		ch = vScal(cv, 1 / vMag(cv));
+		ph = vScal(ppv, 1 / vMag(ppv));
+		dcb = acos(vDot(bh, ch));
+		dpb = acos(vDot(ph, bh));
+		dpc = acos(vDot(ph, ch));
 		if (dpb > dcb) {res = 0; break;}
 		if (dpc > dcb) {res = 0; break;}
 		if (rp > rb) {res = 0; break;}
 		if (rp > rc) {res = 0; break;}
 		if ((rp < rb) && (rp < rc)) { res = 1; break;}
-		bh = dvCross(nv, ch);
-		ax = dvDot(v1, ch); px = dvDot(*pv, ch);
-		ay = dvDot(v1, bh); py = dvDot(*pv, bh);
-		bx = dvDot(v2, ch); cx = dvDot(v3, ch);
-		by = dvDot(v2, bh); cy = dvDot(v3, bh);
+		bh = vCross(nv, ch);
+		ax = vDot(v1, ch); px = vDot(*pv, ch);
+		ay = vDot(v1, bh); py = vDot(*pv, bh);
+		bx = vDot(v2, ch); cx = vDot(v3, ch);
+		by = vDot(v2, bh); cy = vDot(v3, bh);
 		m1 = (ay - py) / (ax - px);
 		m2 = (by - cy) / (bx - cx);
 		b1 = ay - ax * m1;
@@ -312,7 +226,7 @@ int FInter3D(dVECTOR v1, dVECTOR v2, dVECTOR v3, dVECTOR lv,
 	return (res);
 }
 
-
+	// Get a unit vector from screen coordinates...
 dVECTOR ScrUnit3D(p3DEnv tenv, _XYCrd tgt) {
 
 	dVECTOR sunit, tv, iv, jv, kv;
@@ -338,6 +252,7 @@ dVECTOR ScrUnit3D(p3DEnv tenv, _XYCrd tgt) {
 	return (sunit);	
 }
 
+	// Alternate to above, polar coordinates
 _XYCrd Screen3Dr(p3DEnv tenv, dVECTOR vvert) {
 	_XYCrd scrn;
 	double ia, ja, ka, fx, fy;
@@ -348,11 +263,11 @@ _XYCrd Screen3Dr(p3DEnv tenv, dVECTOR vvert) {
 	slack = 50;
 	alim = 3 * PI/4;
 
-	tmpv = dvAdd(vvert, dvScal(tenv->opos, -1));
-	pr = dvMag(tmpv);
-	ia = dvDot(tenv->oiv, tmpv);
-	ja = dvDot(tenv->ojv, tmpv);
-	ka = dvDot(tenv->okv, tmpv);
+	tmpv = vAdd(vvert, vScal(tenv->opos, -1));
+	pr = vMag(tmpv);
+	ia = vDot(tenv->oiv, tmpv);
+	ja = vDot(tenv->ojv, tmpv);
+	ka = vDot(tenv->okv, tmpv);
 	pt = atan(fabs(ja/ia));
 	if (ia < 0) pt = PI - pt;
 	if (ja < 0) pt = -pt;
@@ -372,6 +287,7 @@ _XYCrd Screen3Dr(p3DEnv tenv, dVECTOR vvert) {
 	return scrn;
 }
 
+	// Calc area of triangle on screen in pixels
 long int triarea3D(_XYCrd c1, _XYCrd c2, _XYCrd c3) {
 
 	int fi, lx, rx;
@@ -411,7 +327,7 @@ long int triarea3D(_XYCrd c1, _XYCrd c2, _XYCrd c3) {
 	return area;
 }
 
-
+	// Fill a triangle with tcol (uses gl_line())
 int tricolor3D(_XYCrd c1, _XYCrd c2, _XYCrd c3, long int tcol, int wf) {
 	int fi, lx, rx;
 	float s12, s23, s13;
@@ -465,7 +381,7 @@ int tricolor3D(_XYCrd c1, _XYCrd c2, _XYCrd c3, long int tcol, int wf) {
 	return (ty3 - ty1) + 1;
 }
 
-
+	// Do lighted shading - luminunous faces
 _3DCol LtShade3D(_3DCol fcol, p3DEnv senv, dVECTOR norm, dVECTOR ctr,
 			 float lum) {
 	_3DCol rcol;
@@ -475,10 +391,10 @@ _3DCol LtShade3D(_3DCol fcol, p3DEnv senv, dVECTOR norm, dVECTOR ctr,
 	int cval;
 	dVECTOR cv, cu;
 
-	cv = dvAdd(senv->opos, dvScal(ctr, -1));
-	fc = dvMag(cv);
-	cu = dvScal(cv, 1 / fc);
-	c1 = dvDot(cu, norm);
+	cv = vAdd(senv->opos, vScal(ctr, -1));
+	fc = vMag(cv);
+	cu = vScal(cv, 1 / fc);
+	c1 = vDot(cu, norm);
 	if (c1 > 0) {
 		Mf = 5 * log10(fc/(AU * c1)) + lum;
 	}
@@ -497,7 +413,7 @@ _3DCol LtShade3D(_3DCol fcol, p3DEnv senv, dVECTOR norm, dVECTOR ctr,
 	return (rcol);
 }
 
-
+	// Do lighted shading - unlit faces
 _3DCol FcShade3D(_3DCol fcol, p3DEnv senv, dVECTOR norm, dVECTOR ctr,
 			 float refl) {
 	_3DCol rcol;
@@ -513,18 +429,18 @@ _3DCol FcShade3D(_3DCol fcol, p3DEnv senv, dVECTOR norm, dVECTOR ctr,
 	i = 0;	
 	fr = 0.0;
 	ru = dNULLV; rv = dNULLV;
-	cv = dvAdd(senv->opos, dvScal(ctr, -1));
-	fc = dvMag(cv);
-	cu = dvScal(cv, 1 / fc);
-	c1 = dvDot(cu, norm);
+	cv = vAdd(senv->opos, vScal(ctr, -1));
+	fc = vMag(cv);
+	cu = vScal(cv, 1 / fc);
+	c1 = vDot(cu, norm);
 	if (c1 > 0) {
 		i = 0;
 		tlum = 0.0;
 		while (1) {
-			rv = dvAdd(senv->lo[i]->center, dvScal(ctr, -1));
-			fr = dvMag(rv);
-			ru = dvScal(rv, 1 / fr);
-			c2 = dvDot(ru, norm);
+			rv = vAdd(senv->lo[i]->center, vScal(ctr, -1));
+			fr = vMag(rv);
+			ru = vScal(rv, 1 / fr);
+			c2 = vDot(ru, norm);
 			if (c2 > 0) {
 				Mf = 5 * log10((fc * fr)/
 				  (refl * AU * AU * c1 * c2))
@@ -564,9 +480,9 @@ _XYCrd DrawFW3D(p3DEnv wenv, p3DFace fn) {
 	tva = fn->v[0]->v;
 	tvb = fn->v[1]->v;
 	tvc = fn->v[2]->v;
-	zv = dCenter(tva, tvb, tvc);
-	zv = dvAdd(zv, dvScal(wenv->opos, -1));
-	ft1 = dvDot(zv, wenv->oiv);
+	zv = vCenter(tva, tvb, tvc);
+	zv = vAdd(zv, vScal(wenv->opos, -1));
+	ft1 = vDot(zv, wenv->oiv);
 	if (ft1 > 0) {
 		vc1 = Screen3Dr(wenv, tva);
 		vc2 = Screen3Dr(wenv, tvb);
@@ -599,9 +515,9 @@ int DrawWire3D(p3DEnv wenv, p3DObjA wobj) {
 			tva = fc->v[0]->v;
 			tvb = fc->v[1]->v;
 			tvc = fc->v[2]->v;
-			zv = dCenter(tva, tvb, tvc);
-			zv = dvAdd(zv, dvScal(wenv->opos, -1));
-			ft1 = dvDot(zv, wenv->oiv);
+			zv = vCenter(tva, tvb, tvc);
+			zv = vAdd(zv, vScal(wenv->opos, -1));
+			ft1 = vDot(zv, wenv->oiv);
 			if (ft1 > 0) {
 				vc1 = Screen3Dr(wenv, tva);
 				vc2 = Screen3Dr(wenv, tvb);
@@ -619,6 +535,8 @@ int DrawWire3D(p3DEnv wenv, p3DObjA wobj) {
 	return fcnt;
 }
 
+  //
+	// Get nearest faces of objects and put in env.
 int NearFace3D(p3DObjA wobj, p3DEnv wenv) {
 
 	int fi, fj, fk, fl;
@@ -634,7 +552,7 @@ int NearFace3D(p3DObjA wobj, p3DEnv wenv) {
 	while ((objr != NULL) && (objr->df == 1)) {
 		fc = objr->f;
 		fp = NULL; ft2 = 1.0E30;
-		vv = dvAdd(objr->center, dvScal(wenv->opos, -1));
+		vv = vAdd(objr->center, vScal(wenv->opos, -1));
 		wenv->ncu[fl] = vv;
 		while(fc != NULL) {
 			tva = fc->v[0]->v;
@@ -654,7 +572,7 @@ int NearFace3D(p3DObjA wobj, p3DEnv wenv) {
 			tva = fp->v[0]->v;
 			tvb = fp->v[1]->v;
 			tvc = fp->v[2]->v;
-			wenv->nfp[fl] = dCenter(tva, tvb, tvc);
+			wenv->nfp[fl] = vCenter(tva, tvb, tvc);
 			wenv->nfv[fl] = FaceVel3D(objr, fp);
 			fl++;
 		}
@@ -666,6 +584,8 @@ int NearFace3D(p3DObjA wobj, p3DEnv wenv) {
 	return 1;
 } 
 
+  //
+	// Find a face.., return -1 if no intercept, otherwise face#
 void RayFace3D(p3DObjA wobj, dVECTOR pv, dVECTOR vv, 
 			p3DFace fp, p3DObjL op, double *ETA)
 {
@@ -771,13 +691,13 @@ int DrawZS3D(p3DEnv wenv, p3DObjA wobj) {
 					tva = face->v[0]->v;
 					tvb = face->v[1]->v;
 					tvc = face->v[2]->v;
-					zv = dCenter(tva, tvb, tvc);
-					zv = dvAdd(zv, dvScal(wenv->opos, -1));
-					cv = dvScal(zv, 1 / dvMag(zv));
-					nv = dNorm(tva, tvb, tvc);
-					ft1 = dvDot(cv, nv);
+					zv = vCenter(tva, tvb, tvc);
+					zv = vAdd(zv, vScal(wenv->opos, -1));
+					cv = vScal(zv, 1 / vMag(zv));
+					nv = vNorm(tva, tvb, tvc);
+					ft1 = vDot(cv, nv);
 					if ((ft1 < 0) || (face->back == 1)) {
-						ft2 = dvDot(zv, wenv->oiv);
+						ft2 = vDot(zv, wenv->oiv);
 						if (ft2 > 0) {
 							vc1 = Screen3Dr(wenv, tva);
 							svf =  vc1.flag;
@@ -817,8 +737,8 @@ int DrawZS3D(p3DEnv wenv, p3DObjA wobj) {
 			  }
 			  case 2:{
 				zv = objr->center;
-				zv = dvAdd(zv, dvScal(wenv->opos, -1));
-				ft2 = dvDot(zv, wenv->oiv);
+				zv = vAdd(zv, vScal(wenv->opos, -1));
+				ft2 = vDot(zv, wenv->oiv);
 				if (ft2 > 0) {
 					vc1 = Screen3Dr(wenv, zv);
 					if (!vc1.flag) {
@@ -876,13 +796,13 @@ int DrawZS3D(p3DEnv wenv, p3DObjA wobj) {
 			zv = objr->center;
 			vc1 = Screen3Dr(wenv, zv);
 				// find radius in pixels
-			ft2 = dvMag(dvAdd(zv, dvScal(wenv->opos, -1)));
+			ft2 = vMag(vAdd(zv, vScal(wenv->opos, -1)));
 			ft2 = atan(fabs(objr->dsize / ft2));
 			svf = ft2 * wenv->vscal; // radius in pixels
 			if (svf < 2) pflag = 1;
 				// NOTE: am using polar version
-			nv = dvScal(zv, -1);
-			nv = dvScal(nv, 1 / dvMag(nv));
+			nv = vScal(zv, -1);
+			nv = vScal(nv, 1 / vMag(nv));
 			lscol = objr->dcol;
 			lscol = LtShade3D(lscol, wenv, nv, zv, objr->lumin);
 			vcol = gl_rgbcolor(lscol.r, lscol.g, lscol.b);
@@ -912,7 +832,7 @@ int DrawZS3D(p3DEnv wenv, p3DObjA wobj) {
 				zv = tva;
 			}
 			else {
-				zv = dCenter(tva, tvb, tvc);
+				zv = vCenter(tva, tvb, tvc);
 				vc1 = Screen3Dr(wenv, tva);
 				vc2 = Screen3Dr(wenv, tvb);
 				vc3 = Screen3Dr(wenv, tvc);
@@ -941,7 +861,7 @@ int DrawZS3D(p3DEnv wenv, p3DObjA wobj) {
 			  }
 				// Yes, do use lighting...
 			  else {
-				nv = dNorm(tva, tvb, tvc);
+				nv = vNorm(tva, tvb, tvc);
 				lscol = face->rgb;
 				if (objr->lumin > -100) lscol = 
 					LtShade3D(lscol, wenv, nv, zv,
@@ -976,18 +896,18 @@ void ObjMove(p3DObjA mobj, p3DEnv menv) {
 	while (objr != NULL) {
 		if (objr->df == 2) {
 			fv = objr->vel;
-			objr->center = dvAdd(objr->center, 
-				dvScal(fv, menv->delta));
+			objr->center = vAdd(objr->center, 
+				vScal(fv, menv->delta));
 		}
 		else {
 			fv = objr->vel;
 			vc = objr->v;
 			while (vc != NULL) {
-				vc->v = dvAdd(vc->v, dvScal(fv, menv->delta));
+				vc->v = vAdd(vc->v, vScal(fv, menv->delta));
 				vc = vc->nx;	
 			}
-			objr->center = dvAdd(objr->center, 
-				dvScal(fv, menv->delta));
+			objr->center = vAdd(objr->center, 
+				vScal(fv, menv->delta));
 		}
 		objr = objr->nx;
 	}
@@ -1071,7 +991,7 @@ int PartObj3D(p3DObjL pobj, int plvl, int tflag,
 
 				// if seg hasn't been marked... 
 			if (sdone == NULL) {
-			   	nv[k] = AddVert3D(pobj, dvMidPt(v1->v,
+			   	nv[k] = AddVert3D(pobj, vMidPt(v1->v,
 					v2->v, tflag, center, rflag, trv));
 			   	s1->vf = nv[k];
 			   	s2->vf = nv[k];
@@ -1173,4 +1093,5 @@ int PartObj3D(p3DObjL pobj, int plvl, int tflag,
 	return (fcnt); // return new count of faces
 }
 
-#endif // end of 3ddefs.c 
+// end of 3ddefs.cpp
+//
