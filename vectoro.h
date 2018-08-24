@@ -1,6 +1,8 @@
 //
 // vectoro.h
 //
+//  see definitions in vectoro.cpp
+//
 // class-based vector library
 // (Pat Struthers)
 // 8/23/18 - the basics
@@ -28,15 +30,28 @@ class DVector {
 		~DVector();
 			// protos for basic functions
 		void set(double x, double y, double z);	// set
-		char *show();											// display
+		void show(char *res);											// display
 		DVector add(DVector b);					// vector addition
-		double mag();											// magnitude
-		DVector mult(double s);					// scalar multiply		
-		double dot(DVector b);						// dot product
+		DVector diff(DVector b);				// 'subtraction' (difference)
+		DVector mult(double s);					// scalar multiply	
+		double mag();										// magnitude
+		DVector unit();									// unit vector
+		double dot(DVector b);					// dot product
 		DVector cross(DVector b);				// cross product
+			//rotation
+		DVector DVector::rot(char axis, double frot);  // about one of xyz axes
+		DVector DVector::rot3D(DVector irv, DVector jrv, double rota);  // around 'i' axis of arbitrary ijk system
+
 	protected:
 		double vx, vy, vz;
 };
+
+// external vector functions
+double DV_acos(DVector avect, DVector bvect, DVector cvect); //non-ambiguous arccosine function, avect -> bvect
+																														 //  cvect defines 'side' that angle rotates thru from a to b
+DVector DV_norm(DVector v1, DVector v2, DVector v3);   // normal based on three vertices of a face
+DVector DV_center(DVector v1, DVector v2, DVector v3); // center ('average') of three vertices of a face
+
 
 #endif
 // end of vectoro.h
