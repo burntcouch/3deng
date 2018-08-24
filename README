@@ -1,13 +1,29 @@
-# SDL2 3D engine - see 3Dengine.doc for the real docs
+# SDL2 3D engine - see 3Dengine.rtf for the real docs
 #
 #
-Requirements:
+
+8/24/18:
+This whole thing is a long time coming, and takes some explanation (for the straight docs, stay tuned with the .rtf as mentioned above).
+
+Essentially, I am a back to basics guy, and I hate to use any kind of library when I don't know how the basic algorithms work.  With a 3D rendering engine, though...I only have so much time in my life, and I don't wanna waste it mucking with the details of initializing and environment and rendering a polygon on seventy-billion different kinds of graphics hardware, so...I started out with svgalib back and the day.
+
+Svgalib died, practically when I began this, though...but as of 2018 there are MANY options.  SDL 2.x is where I'm going now, mostly because Simon Struthers wants to learn the low-end stuff for 3D rendering and SDL 2 is going to be his platform for HIS stuff.  No hay problema, sez I....
+
+But C++ is where it's at, and after using Perl and Ruby for many, many years now, I am a lot more comfortable with OO programming.  Thus the retooling.  I have a LOT to do.
+
+This engine is NOT intended for high-performance; it is an instructional project, for myself and Simon and for anyone who would like to do this kind of thing from the ground up.  I plan on documenting it exhaustively, right down to the the basic algorthimic strategies I use to implement it.
+
+To begin with, the engine will be VERY primitive; the core structure of every object is a linked list of body-centered vertices and oriented triangular faces.  All the 3D projective calculations will be made by this engine, and SDL will only be used for initializing the graphics environment, graphics page management, GUI stuff, and drawing/clipping/coloring/animating the polygons.  As I hit the performance limits of this strategy, the engine will move over to using SDL/OpenGL for 3D specific functions.
+
+-------------------------------
+
+Devolopment Environment:
 
 Linux
 gcc, g++, libcX-dev and libstdc++X-dev
 SDL2 and SDL2-dev
 
-I am using Debian 9.x amd64, and gcc-6 is standard there, so...
+Simon, I'm hoping, will test ports over to the Windows world with Visual Studio, once he's got something to work with here.  In any case...I am using Debian 9.x amd64, and gcc-6 is standard there, so...
 
 apt-get install gcc
 apt-get install g++
@@ -25,7 +41,7 @@ apt-get install libsdl2-dev
 apt-get install libsdl2-doc
 apt-get install libsdl2-gfx-doc
 
-I use 'elvis-tiny' (and alias 'vi' to it) as my cmdline editor, and SciTE as an editor in X.
+I use 'elvis-tiny' (and alias 'vi' to it) as my cmdline editor, and gedit as an editor in X.
 
 Heh heh.  That will do for a start.
 
