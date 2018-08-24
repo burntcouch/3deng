@@ -15,6 +15,8 @@ using namespace std;
 
 int main(void);
 
+void vdump(char *caption, DVector *v);
+
 int main(void) 
 {
 			// vector tests
@@ -35,15 +37,20 @@ int main(void)
 	dv = v2.dot(v3);
 	vmag = v1.mag();
 	cout << dv << "\n" << vmag << "\n\n";
-	v2.show(buf);
-	cout << "V2      : " << buf << "\n\n";
-	v3.show(buf);
-	cout << "V3      : " << buf << "\n\n";
-	v1.show(buf);
-	cout << "V2 + V3 : " << buf << "\n\n"; 
-	cout << "V2 . V3 : " << v2.dot(v3) << "\n\n";
-	cout << "V1 mag  : " << v1.mag() << "\n\n";
-	v4.show(buf); 
-	cout << "arbitrary unit : " << buf << "\n\n";
+	vdump("V2      : ", &v2);
+	vdump("V3      : ", &v3);
+	vdump("V2 + V3 : ", &v1); 
+	cout << "\nV2 . V3 : " << v2.dot(v3) << "\n";
+	cout << "V1 mag  : " << v1.mag() << "\n";
+	vdump("\narbitrary unit : ", &v4);
+	cout << "\n\n";
 	return 0;
 }
+
+void vdump(char *caption, DVector *v) {
+	char buf[100] = "\0";
+	
+	v->show(buf);
+	cout << caption << buf << "\n";
+}
+
