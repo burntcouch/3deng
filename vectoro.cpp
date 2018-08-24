@@ -141,12 +141,12 @@ double DV_acos(DVector avect, DVector bvect, DVector cvect)
 
 
 DVector DV_norm(DVector v1, DVector v2, DVector v3) {
-	dVECTOR tv1, tv2, resv;
+	DVector tv1, tv2, resv;
 	
 	tv1 = v1.add(v2.mult(-1.0));
 	tv2 = v2.add(v3.mult(-1.0));
 	resv = tv1.cross(tv2);
-	resv = resv.mult(1.0 / resv.mag);
+	resv = resv.mult(1.0 / resv.mag());
 	return resv;
 }
 

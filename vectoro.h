@@ -39,8 +39,8 @@ class DVector {
 		double dot(DVector b);					// dot product
 		DVector cross(DVector b);				// cross product
 			//rotation
-		DVector DVector::rot(char axis, double frot);  // about one of xyz axes
-		DVector DVector::rot3D(DVector irv, DVector jrv, double rota);  // around 'i' axis of arbitrary ijk system
+		DVector rot(char axis, double frot);  // about one of xyz axes
+		DVector rot3D(DVector irv, DVector jrv, double rota);  // around 'i' axis of arbitrary ijk system
 
 	protected:
 		double vx, vy, vz;
