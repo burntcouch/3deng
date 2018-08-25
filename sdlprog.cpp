@@ -7,20 +7,32 @@
 // gotcha #1 -- this is just 'iostream', NOT 'iostream.h' anymore
 #include <iostream>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL2_gfxPrimitives.h>  // for, uh, drawing primitives.  filledTrigonRGBA for one...
+//  and don't forget the -lSDL2_gfx library, either...
 
 #include "vectoro.cpp"   // to test c++ reworking of vectors.c to .cpp
 
 // gotcha #2 -- add this line to keep from having to use 'std::cout' below instead of just 'cout'
 using namespace std;
 
-int main(void);
+// prototypes
+int main( int argc, char* args[]);
 
 void vdump(char *caption, DVector *v);
 DVector *vrand(void);
 
+//
+// SDL stuff
+//
+//Screen dimension constants 
+const int SCREENW = 1024; 
+const int SCREENH = 600;
+
+// init any class variables that need it
+//
 int DVector::debug = 0;  // set the debug flag  NOTICE THAT THIS IS OUTSIDE main() !!
 
-int main(void) 
+int main( int argc, char* args[]) 
 {
 			// vectoro tests
 
@@ -80,6 +92,61 @@ int main(void)
 		sprintf(zstr, "Rot %4.1f deg abt. z of:", theta);
 		vdump(zstr, pz);
 	}
+
+	char dummy;
+	cout << "Hit key to continue...\n";
+	cin >> dummy;
+
+	// SDL stuff
+	//
+  if (SDL_Init(SDL_INIT_VIDEO) == 0) {
+      SDL_Window* window = NULL;
+      SDL_Renderer* renderer = NULL;
+
+      if (SDL_CreateWindowAndRenderer(SCREENW, SCREENH, 0, &window, &renderer) == 0) {
+          SDL_bool done = SDL_FALSE;
+
+          while (!done) {
+              SDL_Event event;
+
+              SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+              SDL_RenderClear(renderer);
+
+              SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+              SDL_RenderDrawLine(renderer, 320, 200, 300, 240);
+              SDL_RenderDrawLine(renderer, 300, 240, 340, 240);
+              SDL_RenderDrawLine(renderer, 340, 240, 320, 200);
+
+							// now let's see...
+							int px1 = 20, py1 = 20;
+							int px2 = 500, py2 = 200;
+							int px3 = 100, py3 = 300;
+              SDL_SetRenderDrawColor(renderer, 100, 55, 55, SDL_ALPHA_OPAQUE);
+              SDL_RenderDrawLine(renderer, px1, py1, px2, py2);
+              SDL_RenderDrawLine(renderer, px2, py2, px3, py3);
+              SDL_RenderDrawLine(renderer, px3, py3, px1, py1);
+
+							filledTrigonRGBA(renderer, px1, py1, px2, py2, px3, py3, 55, 100, 100, SDL_ALPHA_OPAQUE);
+
+              SDL_RenderPresent(renderer);
+
+              while (SDL_PollEvent(&event)) {
+                  if (event.type == SDL_QUIT) {
+                      done = SDL_TRUE;
+                  }
+              }
+          }
+      }
+
+      if (renderer) {
+          SDL_DestroyRenderer(renderer);
+      }
+      if (window) {
+          SDL_DestroyWindow(window);
+      }
+  }
+  SDL_Quit();
+
 
 	return 0;
 }

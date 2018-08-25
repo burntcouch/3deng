@@ -2,7 +2,7 @@
 #  --- working makefile
 #
 3DCURRVER = 0.501
-SDLLIBS = -lSDL2 -lm
+SDLLIBS = -lSDL2 -lSDL2_gfx -lm
 
 ifdef 3DVER
 	3DCURRVER := $(3DVER)
