@@ -131,9 +131,39 @@ int main( int argc, char* args[])
               SDL_RenderPresent(renderer);
 
               while (SDL_PollEvent(&event)) {
-                  if (event.type == SDL_QUIT) {
-                      done = SDL_TRUE;
-                  }
+                if (event.type == SDL_QUIT) {
+                    done = SDL_TRUE;
+                }
+									//User presses a key 
+								else if( event.type == SDL_KEYDOWN ) { 
+									//Select surfaces based on key press 
+									switch( event.key.keysym.sym ) { 
+
+
+										case SDLK_UP: cout << "up\n"; break; 
+										case SDLK_DOWN: cout << "down\n"; break; 
+										case SDLK_LEFT: cout << "left\n"; break; 
+										case SDLK_RIGHT: cout << "right\n"; break; 
+										default: ; break; 
+									} 
+								}
+									// User does something with mouse
+								else if( event.type == SDL_MOUSEMOTION || 
+									event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP ) {
+									//Get mouse position 
+									int x, y; 
+									SDL_GetMouseState( &x, &y );
+									// check to see if motion is inside test area
+									cout << "mouse is at" << x << ":" << y << "\n";
+									switch (event.type) {									
+										case SDL_MOUSEMOTION: cout << "mouse is moving\n";
+											break;
+										case SDL_MOUSEBUTTONDOWN: cout << "button down\n";
+											break;
+										case SDL_MOUSEBUTTONUP: cout << "button up\n";
+											break;
+									}
+								}
               }
           }
       }
