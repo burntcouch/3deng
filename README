@@ -5,9 +5,9 @@
 8/24/18:
 This whole thing is a long time coming, and takes some explanation (for the straight docs, stay tuned with the .rtf as mentioned above).
 
-Essentially, I am a back to basics guy, and I hate to use any kind of library when I don't know how the basic algorithms work.  With a 3D rendering engine, though...I only have so much time in my life, and I don't wanna waste it mucking with the details of initializing and environment and rendering a polygon on seventy-billion different kinds of graphics hardware, so...I started out with svgalib back and the day.
+Essentially, I am a back to basics guy, and I hate to use any kind of library when I don't know how the basic algorithms work.  With a 3D rendering engine, though...I only have so much time in my life, and I don't wanna waste it mucking with the details of initializing and environment and rendering a polygon on seventy-billion different kinds of graphics hardware, so...I started out with svgalib back (2001) in the day.
 
-Svgalib died, practically when I began this, though...but as of 2018 there are MANY options.  SDL 2.x is where I'm going now, mostly because Simon Struthers wants to learn the low-end stuff for 3D rendering and SDL 2 is going to be his platform for HIS stuff.  No hay problema, sez I....
+Svgalib died, practically when I began the project, though...but as of 2018 there are MANY options.  SDL 2.x is where I'm going now, mostly because Simon Struthers wants to learn the low-end stuff for 3D rendering and SDL 2 is going to be his platform for HIS stuff.  No hay problema, sez I....
 
 But C++ is where it's at, and after using Perl and Ruby for many, many years now, I am a lot more comfortable with OO programming.  Thus the retooling.  I have a LOT to do.
 

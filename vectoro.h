@@ -23,6 +23,8 @@ using namespace std;
 
 class DVector {
 	public:
+		static int debug;  // well, self-explanatory?
+
 			// protos for constructor and destructor
 		DVector();  // initialize to null vector
 		DVector(char ax);  // initialize as a unit vector (x/i, y/j, z/k, default null)
@@ -41,6 +43,7 @@ class DVector {
 			//rotation
 		DVector rot(char axis, double frot);  // about one of xyz axes
 		DVector rot3D(DVector irv, DVector jrv, double rota);  // around 'i' axis of arbitrary ijk system
+
 
 	protected:
 		double vx, vy, vz;

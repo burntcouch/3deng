@@ -11,7 +11,7 @@
 
 // constructors
 DVector::DVector() {  // default is null vector
-	cerr << "creating a null DVector\n";
+	if (debug) cerr << "creating a null DVector\n";
 
 	vx = 0.0;
 	vy = 0.0;
@@ -19,10 +19,12 @@ DVector::DVector() {  // default is null vector
 }
 
 DVector::DVector(char ax) {  // unit vectors, defaults to null vector
-	char sax[2] = " ";
 
-	sax[0] = ax;
-	cerr << "creating a '" << sax << "' DVector\n";
+	if (debug) {
+		char sax[2] = " ";
+		sax[0] = ax;
+		cerr << "creating a '" << sax << "' DVector\n";
+	}
 
 	switch(ax) {
 		case 'x':
@@ -37,19 +39,26 @@ DVector::DVector(char ax) {  // unit vectors, defaults to null vector
 		case 'Z':
 		case 'K':
 		case 'k': vx = 0.0; vy = 0.0; vz = 1.0; break;
+		case 'r':
+		case 'R':
+				vx = (((double) rand()) / RAND_MAX - 0.5);
+				vy = (((double) rand()) / RAND_MAX - 0.5);
+				vz = (((double) rand()) / RAND_MAX - 0.5);
+				*this = this->unit();
+				break;
 		default:  vx = 0.0; vy = 0.0; vz = 0.0; break;
 	};
 }
 
 DVector::DVector(double x, double y, double z) {  // obvious?
-	cerr << "creating a DVector\n";
+	if (debug) cerr << "creating a DVector\n";
 	vx = x;
 	vy = y;
 	vz = z;
 };
 
 DVector::~DVector() {
-	cerr << "destructing a DVector\n";
+	if (debug) cerr << "destructing a DVector\n";
 };
 
 // definitions of basic vector functions
