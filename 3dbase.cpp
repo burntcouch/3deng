@@ -71,6 +71,22 @@ Colora::Colora(unsigned int ir, unsigned int ig, unsigned int ib, unsigned int i
 
 Colora::~Colora() {}
 
+// some basic colors
+
+const Colora black(0, 0, 0, 255);
+const Colora maxWht(255, 255, 255, 255);
+const Colora maxRed(255, 0, 0, 255);
+const Colora maxGrn(0, 255, 0, 255);
+const Colora maxBlu(0, 0, 255, 255);
+const Colora ltGry(100, 100, 100, 255);
+const Colora ltRed(100, 0, 0, 255);
+const Colora ltGrn(0, 100, 0, 255);
+const Colora ltBlu(0, 0, 100, 255);
+const Colora dkGry(30, 30, 30, 255);
+const Colora dkRed(50, 0, 0, 255);
+const Colora dkGrn(0, 50, 0, 255);
+const Colora dkBlu(0, 0, 50, 255);
+
 //
 // *** Trig3D - convenience object for SDL rendering
 //

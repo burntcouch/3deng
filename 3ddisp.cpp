@@ -33,14 +33,14 @@ class Env3D {
 		Env3D();
 		~Env3D();
 
-		SDL_renderer * render;
-		SDL_window * window;
+		SDL_Renderer * render;
+		SDL_Window * window;
 		ObjList * olist;
 		XYCrd wsize;
 
 	protected:
 
-}
+};
 
 Env3D::Env3D() {}
 Env3D::~Env3D() {}

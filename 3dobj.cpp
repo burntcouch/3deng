@@ -22,7 +22,10 @@
 // Obj3D
 
 // ObjList
-
+class ObjList {
+	ObjList();
+	~ObjList();
+};
 
 
 #endif

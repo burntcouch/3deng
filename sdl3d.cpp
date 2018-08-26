@@ -20,14 +20,6 @@
 // gotcha #2 -- add this line to keep from having to use 'std::cout' below instead of just 'cout'
 using namespace std;
 
-// some basic colors
-
-Colora wht(255, 255, 255, 255);
-Colora red(255, 0, 0, 255);
-Colora grn(0, 255, 0, 255);
-Colora blu(0, 0, 255, 255);
-Colora blk(0, 0, 0, 255);
-
 // prototypes
 int main( int argc, char* args[]);
 
@@ -115,9 +107,9 @@ int main( int argc, char* args[]) {
 					}
 				} // end of event handler
 
-        SDL_SetRenderDrawColor(renderer, blk.r, blk.g, blk.b, 255);  // set to black and full alpha
+        SDL_SetRenderDrawColor(renderer, black.r, black.g, black.b, 255);  // set to black and full alpha
         SDL_RenderClear(renderer);  // clear screen
-				SDL_SetRenderDrawColor(renderer, wht.r, wht.g, wht.b, 255);
+//				SDL_SetRenderDrawColor(renderer, maxWht.r, maxWht.g, maxWht.b, 255);
 					//
 					// ** below here, DRAW stuff
 					// ***
