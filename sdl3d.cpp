@@ -12,12 +12,23 @@
 #include <SDL2/SDL2_gfxPrimitives.h>  // for, uh, drawing primitives.  filledTrigonRGBA for one...
 //  and don't forget the -lSDL2_gfx library, either...
 
-#include "vectoro.cpp"   // to test c++ reworking of vectors.c to .cpp
+#include "vectoro.cpp"   // DVector object and functions
+#include "3dbase.cpp"    // XYCrd, Colora, Trig3D objects
+#include "3ddisp.cpp"    // Env3D, Disp3D objects
+#include "3dobj.cpp"		 // Face3D, Seg3D, Vert3D, Obj3D, ObjList objects
 
 // gotcha #2 -- add this line to keep from having to use 'std::cout' below instead of just 'cout'
 using namespace std;
 
+// some basic colors
 
+Colora wht(255, 255, 255, 255);
+Colora red(255, 0, 0, 255);
+Colora grn(0, 255, 0, 255);
+Colora blu(0, 0, 255, 255);
+Colora blk(0, 0, 0, 255);
+
+// prototypes
 int main( int argc, char* args[]);
 
 //
@@ -29,7 +40,7 @@ const int SCREENH = 600;
 
 // init any class variables that need it
 //
-int DVector::debug = 0;  // set the debug flag  NOTICE THAT THIS IS OUTSIDE main() !!
+int DVector::debug = 0;  // set the debug flag  NOTICE THAT statics must be initialized outside main() !!
 
 int main( int argc, char* args[]) {
 
@@ -50,9 +61,11 @@ int main( int argc, char* args[]) {
       SDL_bool done = SDL_FALSE;
 
 			// now let's see...define three points
-			int px1 = 20, py1 = 20;
-			int px2 = 500, py2 = 200;
-			int px3 = 100, py3 = 300;
+			Trig3D p1;
+			p1.push(new XYCrd(100, 300));
+			p1.push(new XYCrd(500, 200));
+			p1.push(new XYCrd(20, 20));
+			p1.color = Colora(55, 100, 100, 255);
 
 			startTime = SDL_GetTicks();
       while (!done) {
@@ -68,15 +81,15 @@ int main( int argc, char* args[]) {
 						cout << "elapsed time (ms): " << SDL_GetTicks() - startTime << "\n";
 
 						switch( event.key.keysym.sym ) { 
+							case SDLK_q: done = SDL_TRUE; break;
 
-
-							case SDLK_UP: cout << "up\n"; py1 -= 4; py2 -= 4; py3 -=4;
+							case SDLK_UP: cout << "up\n"; p1.move(0, -4);
 								break; 
-							case SDLK_DOWN: cout << "down\n"; py1 += 4; py2 += 4; py3 +=4;
+							case SDLK_DOWN: cout << "down\n"; p1.move(0, 4);
 								break; 
-							case SDLK_LEFT: cout << "left\n"; px1 -= 4; px2 -= 4; px3 -=4;
+							case SDLK_LEFT: cout << "left\n"; p1.move(-4, 0);
 								break; 
-							case SDLK_RIGHT: cout << "right\n"; px1 += 4; px2 += 4; px3 +=4;
+							case SDLK_RIGHT: cout << "right\n"; p1.move(4, 0);
 								break; 
 							default: ; break; 
 						} 
@@ -102,18 +115,16 @@ int main( int argc, char* args[]) {
 					}
 				} // end of event handler
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);  // set to black and full alpha
+        SDL_SetRenderDrawColor(renderer, blk.r, blk.g, blk.b, 255);  // set to black and full alpha
         SDL_RenderClear(renderer);  // clear screen
+				SDL_SetRenderDrawColor(renderer, wht.r, wht.g, wht.b, 255);
 					//
 					// ** below here, DRAW stuff
+					// ***
 
-        SDL_SetRenderDrawColor(renderer, 100, 55, 55, SDL_ALPHA_OPAQUE);
-        SDL_RenderDrawLine(renderer, px1, py1, px2, py2);
-        SDL_RenderDrawLine(renderer, px2, py2, px3, py3);
-        SDL_RenderDrawLine(renderer, px3, py3, px1, py1);
+				draw_Trig3D(renderer, &p1);
 
-				filledTrigonRGBA(renderer, px1, py1, px2, py2, px3, py3, 55, 100, 100, SDL_ALPHA_OPAQUE);
-
+					// ***
 					// and then flip it onto the screen
 				SDL_RenderPresent(renderer);
 
@@ -135,3 +146,8 @@ int main( int argc, char* args[]) {
 
 	return 0;
 }
+
+
+
+
+

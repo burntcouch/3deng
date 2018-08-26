@@ -12,8 +12,8 @@
 #include <float.h>
 #include <string.h>
 
-#ifndef __DVECTOR
-#define __DVECTOR 1
+//#ifndef __DVECTOR
+//#define __DVECTOR 1
 
 #ifndef PI
 #define PI 3.1415926535898
@@ -56,6 +56,6 @@ DVector DV_norm(DVector v1, DVector v2, DVector v3);   // normal based on three 
 DVector DV_center(DVector v1, DVector v2, DVector v3); // center ('average') of three vertices of a face
 
 
-#endif
+//#endif
 // end of vectoro.h
 //

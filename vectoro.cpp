@@ -5,6 +5,9 @@
 // method definitions for vector objects
 //
 #include <iostream>
+
+#ifndef __DVECTOR
+#define __DVECTOR 1
 #include "vectoro.h"
 
 // method definitions
@@ -222,6 +225,6 @@ DVector DVector::rot3D(DVector irv, DVector jrv, double rota) {
 	return rv2;
 }
 
-
+#endif
 // end of vectoro.cpp
 //
