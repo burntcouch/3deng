@@ -46,6 +46,10 @@ int main( int argc, char* args[])
 
 	srand(time(NULL));  // yes, there are better ways to do this, but...
 
+	Uint32 startTime = 0;
+	
+	startTime = SDL_GetTicks();
+
 	v2.set(1.0, 2.0, 3.0);
 	v1 = v2.add(v3);
 
@@ -96,6 +100,7 @@ int main( int argc, char* args[])
 	char dummy;
 	cout << "Hit key to continue...\n";
 	cin >> dummy;
+	cout << "elapsed time (ms): " << SDL_GetTicks() - startTime << "\n";
 
 	// SDL stuff
 	//
@@ -137,6 +142,8 @@ int main( int argc, char* args[])
 									//User presses a key 
 								else if( event.type == SDL_KEYDOWN ) { 
 									//Select surfaces based on key press 
+									cout << "elapsed time (ms): " << SDL_GetTicks() - startTime << "\n";
+
 									switch( event.key.keysym.sym ) { 
 
 
@@ -152,6 +159,8 @@ int main( int argc, char* args[])
 									event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP ) {
 									//Get mouse position 
 									int x, y; 
+									cout << "elapsed time (ms): " << SDL_GetTicks() - startTime << "\n";
+
 									SDL_GetMouseState( &x, &y );
 									// check to see if motion is inside test area
 									cout << "mouse is at" << x << ":" << y << "\n";
