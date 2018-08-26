@@ -30,6 +30,9 @@ aback: *.c *.cpp *.h *.doc README* makefile
 sdlprog: sdlprog.cpp
 	g++ sdlprog.cpp -w $(SDLLIBS) -o sdlprog
 	
+sdl3d: sdl3d.cpp
+	g++ sdl3d.cpp -w $(SDLLIBS) -o sdl3d
+
 solex42: solex42.o 
 	gcc -o solex42 solex42.o -lvgagl -lvga -lm
 
