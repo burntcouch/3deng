@@ -52,7 +52,9 @@ int main( int argc, char* args[]) {
     if (SDL_CreateWindowAndRenderer(SCREENW, SCREENH, 0, &window, &renderer) == 0) {
       SDL_bool done = SDL_FALSE;
 
-			// now let's see...define three points
+			// the prep area
+			//
+
 			Trig3D p1;
 			p1.push(new XYCrd(100, 300));
 			p1.push(new XYCrd(500, 200));
@@ -60,6 +62,9 @@ int main( int argc, char* args[]) {
 			p1.color = Colora(55, 100, 100, 255);
 
 			startTime = SDL_GetTicks();
+
+			// now the main loop
+			//
       while (!done) {
         SDL_Event event;
 
@@ -107,10 +112,7 @@ int main( int argc, char* args[]) {
 					}
 				} // end of event handler
 
-        SDL_SetRenderDrawColor(renderer, black.r, black.g, black.b, 255);  // set to black and full alpha
-        SDL_RenderClear(renderer);  // clear screen
-//				SDL_SetRenderDrawColor(renderer, maxWht.r, maxWht.g, maxWht.b, 255);
-					//
+				clear_to_Colora(renderer, black);  // clear screen
 					// ** below here, DRAW stuff
 					// ***
 

@@ -50,6 +50,8 @@ class Colora {
 		void bright(int howmuch);
 };
 
+void clear_to_Colora(SDL_Renderer * r, Colora c);
+
 // defs
 void Colora::fade(int howmuch = 10) {
 	a = a - howmuch;
@@ -74,18 +76,28 @@ Colora::~Colora() {}
 // some basic colors
 
 const Colora black(0, 0, 0, 255);
-const Colora maxWht(255, 255, 255, 255);
+const Colora white(255, 255, 255, 255);
 const Colora maxRed(255, 0, 0, 255);
 const Colora maxGrn(0, 255, 0, 255);
 const Colora maxBlu(0, 0, 255, 255);
-const Colora ltGry(100, 100, 100, 255);
+const Colora maxYlw(255, 255, 0, 255);
+const Colora yellow(150, 150, 0, 255);
+const Colora ltGry(150, 150, 150, 255);
+const Colora midGry(90, 90, 90, 255);
 const Colora ltRed(100, 0, 0, 255);
 const Colora ltGrn(0, 100, 0, 255);
 const Colora ltBlu(0, 0, 100, 255);
+const Colora dkYlw(40, 40, 0, 255);
 const Colora dkGry(30, 30, 30, 255);
 const Colora dkRed(50, 0, 0, 255);
 const Colora dkGrn(0, 50, 0, 255);
 const Colora dkBlu(0, 0, 50, 255);
+
+void clear_to_Colora(SDL_Renderer * r, Colora c) {  // clear r to color c
+    SDL_SetRenderDrawColor(r, c.r, c.g, c.b, c.a);  // set to black and full alpha
+    SDL_RenderClear(r);  
+}
+
 
 //
 // *** Trig3D - convenience object for SDL rendering

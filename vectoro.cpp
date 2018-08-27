@@ -171,6 +171,17 @@ DVector DV_center(DVector v1, DVector v2, DVector v3) {
 	return tmpv;
 }
 
+DVector DV_midpt(DVector v1, DVector v2, DVector ctr) {
+	DVector tmp1, tmp2, resv;
+	double rad;
+
+	tmp1 = (v1.add(v2)).mult(0.5);
+	tmp2 = (ctr.diff(tmp1)).unit();
+	rad = ((v1.diff(ctr)).mag() + (v2.diff(ctr)).mag()) * 0.5;
+	resv = ctr.add(tmp2.mult(rad));
+	return resv;
+}
+
 // rotation methods
 
 DVector DVector::rot(char axis, double frot){

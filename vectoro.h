@@ -54,7 +54,7 @@ double DV_acos(DVector avect, DVector bvect, DVector cvect); //non-ambiguous arc
 																														 //  cvect defines 'side' that angle rotates thru from a to b
 DVector DV_norm(DVector v1, DVector v2, DVector v3);   // normal based on three vertices of a face
 DVector DV_center(DVector v1, DVector v2, DVector v3); // center ('average') of three vertices of a face
-
+DVector DV_midpt(DVector v1, DVector v2, DVector ctr);  // calcs a 'centered' (if not NULL) midpoint
 
 //#endif
 // end of vectoro.h
