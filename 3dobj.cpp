@@ -11,6 +11,10 @@
 #include "vectoro.cpp"
 #endif
 
+#ifndef __3DBASE
+#include "3dbase.cpp"    // XYCrd, Colora, Trig3D objects
+#endif
+
 #ifndef __3DOBJ
 #define __3DOBJ 1
 
@@ -23,6 +27,21 @@ class XX {
 XX:XX() {}
 XX:~XX() {}
 */
+
+// protos
+class Vert3D {};
+class Face3D {};
+class Seg3D {};
+class Obj3D {};
+class ObjList {};
+class ObjXdat {};
+
+typedef Vert3D *pVert3D;
+typedef Face3D *pFace3D;
+typedef Seg3D *pSeg3D;
+typedef Obj3D *pObj3D;
+typedef ObjList *pObjList;
+typedef ObjXdat *pObjXdat;
 
 // Vert3D
 class Vert3D {
@@ -38,8 +57,6 @@ class Vert3D {
 	Seg3D * addseg(Vect3D * nv);
 	void move(DVector p, bool abs);  // offset to new position; if abs true, absolute reposition
 };
-
-typedef Vert3D *pVert3D;
 
 Vert3D::Vert3D();
 Vert3D::~Vert3D();
@@ -99,6 +116,7 @@ pSeg3D Vert3D::addseg(pVert3D nv) {
 	}
 	return res;
 }
+// end of Vert3D
 
 // Face3D
 class Face3D {
@@ -118,8 +136,6 @@ class Face3D {
 	DVector center();
 
 };
-
-typedef Face3D *pFace3D;
 
 Face3D:Face3D() {}
 Face3D:~Face3D() {}
@@ -142,6 +158,7 @@ DVector Face3D::center() {
 	tmpv = tmpv.mult(1 / 3.0);
 	return tmpv;
 }
+// end of Face3D
 
 
 // Seg3D
@@ -163,8 +180,7 @@ Seg3D::Seg3D(Vert3D * otherv) {
 	vf = NULL;
 	next = NULL;
 }
-
-typedef Seg3D *pSeg3D;
+// end of Seg3D
 
 //
 // ObjXdat
@@ -178,8 +194,6 @@ class ObjXdat {
 	Obj3D * amass;
 };
 
-typedef ObjXdat *pObjXdat;
-
 ObjXdat:ObjXdat() {
 	obj = NULL;
 	mass = -1.0;
@@ -188,6 +202,7 @@ ObjXdat:ObjXdat() {
 
 ObjXdat:~ObjXdat() {}
 
+//end of ObjXdat
 
 // Obj3D
 class Obj3D {
@@ -266,8 +281,7 @@ void Obj3D::init_xdat() {
 	xdat = *new ObjXdat();
 
 }
-
-typedef Obj3D *pObj3D;
+//end of Obj3D
 
 //
 // ObjList
@@ -282,8 +296,6 @@ class ObjList {
 
 	pObj3D add(int xf, int otype);
 };
-
-typedef ObjList * pObjList;
 
 ObjList::ObjList() {}
 ObjList::~ObjList() {}
@@ -334,7 +346,7 @@ pObj3D ObjList::addobj( int xf, int otyp ) {
 	}
 	return (nobj);
 }
-
+// end of ObjList
 
 #endif
 // end of 3dobj.cpp

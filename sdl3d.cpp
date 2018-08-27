@@ -16,6 +16,7 @@
 #include "3dbase.cpp"    // XYCrd, Colora, Trig3D objects
 #include "3ddisp.cpp"    // Env3D, Disp3D objects
 #include "3dobj.cpp"		 // Face3D, Seg3D, Vert3D, Obj3D, ObjList objects
+#include "3dgen.cpp"		 // object generation functions
 
 // gotcha #2 -- add this line to keep from having to use 'std::cout' below instead of just 'cout'
 using namespace std;

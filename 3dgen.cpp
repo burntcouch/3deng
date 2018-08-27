@@ -7,9 +7,26 @@
 //  8/26/18 - started file, conversion of PartObj3D to new c++/SDL engine
 //
 
+
+
+#ifndef __DVECTOR
+#include "vectoro.cpp"
+#endif
+
+#ifndef __3DBASE
+#include "3dbase.cpp"    // XYCrd, Colora, Trig3D objects
+#endif
+
+#ifndef __3DOBJ
+#include "3dobj.cpp"
+#endif
+
+#ifndef __3DGEN
+#define __3DGEN 1
+
+//
 // Partition an object into 4 faces/per face
-
-
+//
 int PartObj3D(pObj3D pobj, int plvl)  {
 	// plvl 1 = faces * 4, 2 -> 16, 3 -> 64, 4 -> 256, 5 -> 1024
 
@@ -134,3 +151,5 @@ int PartObj3D(pObj3D pobj, int plvl)  {
 	return (fcnt); // return new count of faces
 }
 
+#endif
+// end of 3dgen.cpp
