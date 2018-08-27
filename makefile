@@ -1,7 +1,7 @@
 # Galactic Explorer 3D engine 
 #  --- working makefile
 #
-3DCURRVER = 0.501
+3DCURRVER = 0.505
 SDLLIBS = -lSDL2 -lSDL2_gfx -lm
 
 ifdef 3DVER
@@ -13,18 +13,19 @@ touchall: *.c *.cpp *.h
 	touch *.cpp; \
 	touch *.h
 
-dist: *.c *.cpp *.h *.doc README* makefile
+dist: *.c *.cpp *.h *.rtf README* LICENSE* makefile
 	tar czf ./distarch/3DEsdl.$(3DCURRVER).tar.gz \
-	*.c *.cpp *.h *.doc makefile README*
+	*.c *.cpp *.h *.rtf makefile README* LICENSE*
 
-aback: *.c *.cpp *.h *.doc README* makefile
+aback: *.c *.cpp *.h *.rtf README* makefile
 	mkdir ./v$(3DCURRVER); \
 	mkdir ./v$(3DCURRVER)/back; \
 	cp *.c ./v$(3DCURRVER); \
 	cp *.cpp ./v$(3DCURRVER); \
 	cp *.h ./v$(3DCURRVER); \
-	cp *.doc ./v$(3DCURRVER); \
+	cp *.rtf ./v$(3DCURRVER); \
 	cp README* ./v$(3DCURRVER); \
+	cp LICENSE* ./v$(3DCURRVER); \
 	cp makefile ./v$(3DCURRVER)
 
 sdlprog: sdlprog.cpp
