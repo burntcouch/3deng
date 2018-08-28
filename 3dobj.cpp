@@ -18,6 +18,8 @@
 #ifndef __3DOBJ
 #define __3DOBJ 1
 
+#define AMASSMAX 10   // limiting # of gravitational 'effecting masses' in ObjXdat
+
 /* object template
 class XX {
 	XX();
@@ -78,7 +80,7 @@ class Vert3D {
 		~Vert3D();
 
 		DVector v;
-		DVector *next;
+		Vert3D *next;
 		Obj3D *obj;   // to get to top of vertlist, this->obj->vhead
 		Seg3D *seg;
 
@@ -229,17 +231,24 @@ DVector Face3D::center() {
 class ObjXdat {
 	public:
 		ObjXdat();
+		ObjXdat(pObj3D nobj);
 		~ObjXdat();
 
-		Obj3D *obj;
+		pObj3D obj;
 		double mass;
-		Obj3D *amass;
+		pObj3D amass[AMASSMAX];
 };
 
 ObjXdat::ObjXdat() {
 	obj = NULL;
 	mass = -1.0;
-	amass = NULL;
+	amass[0] = NULL;
+}
+
+ObjXdat::ObjXdat(pObj3D pobj) {
+	obj = pobj;
+	mass = -1.0;
+	amass[0] = NULL;
 }
 
 ObjXdat::~ObjXdat() {}
@@ -288,11 +297,10 @@ Obj3D::Obj3D() {}
 Obj3D::~Obj3D() {}
 
 void Obj3D::init_xdat() {
-	xdat = new ObjXdat();
-
-	xdat->obj = this;
-	xdat->mass = -1.0;
-	xdat->amass = NULL;
+	this->xdat = new ObjXdat();
+	this->xdat->obj = this;
+	this->xdat->mass = -1.0;
+	this->xdat->amass[0] = NULL;
 }
 
 pVert3D Obj3D::addvert(DVector v) {
@@ -328,10 +336,6 @@ pFace3D Obj3D::addface() {
 	return (face);
 }
 
-void Obj3D::init_xdat() {
-	xdat = new ObjXdat();
-
-}
 //end of Obj3D
 
 //
@@ -354,10 +358,10 @@ ObjList::~ObjList() {}
 
 pObj3D ObjList::addobj( int xf, int otyp ) {
 
-	Obj3D ntlo;
-	Obj3D nobj;
+	pObj3D nlink;
+	pObj3D nobj;
 	
-	nobj = new Obj3D();
+	nobj = new Obj3D;
 
 	if (nobj) {
 		if (head == NULL) {  // new object list
@@ -365,8 +369,8 @@ pObj3D ObjList::addobj( int xf, int otyp ) {
 			tail= nobj;
 		}
 		else {
-			ntlo = tail;
-			ntlo->next = nobj;
+			nlink = tail;
+			nlink->next = nobj;
 			tail = nobj;
 		}
 
@@ -384,9 +388,9 @@ pObj3D ObjList::addobj( int xf, int otyp ) {
 		nobj->ftail = NULL;
 		nobj->vtail = NULL;
 
-		nobj->center = new DVector;
-		nobj->vel = new DVector;
-		nobj->rot = new DVector;	
+		nobj->center = DVector();
+		nobj->vel = DVector();
+		nobj->rot = DVector();	
 		nobj->rox[0] = DVector('i');	
 		nobj->rox[1] = DVector('j');	
 		nobj->rox[2] = DVector('k');	

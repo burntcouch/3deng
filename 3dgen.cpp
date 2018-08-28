@@ -33,8 +33,8 @@ int PartObj3D(pObj3D pobj, int plvl)  {
 	unsigned int fcnt;
 	unsigned int i, k;
 	pFace3D newface, fcurr, foldtail, ftmp;
-	pVert3D v1, v2, sdone;
-	pVert3D *newvert[3];
+	pVert3D v1, v2, vtemp, vdone;
+	pVert3D newvert[3];
 	pSeg3D s1, s2, sdummy, ns;
 
 	DVector center = pobj->center;
@@ -60,11 +60,11 @@ int PartObj3D(pObj3D pobj, int plvl)  {
 				s2 = v2->seg;
 
 				// next we have to verify vert isn't already built, and which segs in v1, v2 it is on
-				sdone = NULL;
+				vdone = NULL;
 				while (s1 != NULL) {  // hopefully there ARE some segs in v1
 					if (s1->v == v2) {
 						if (s1->vf != NULL) {  // did we already do this segment?
-							sdone = s1->vf;  // this is the new vert here
+							vdone = s1->vf;  // this is the new vert here
 						}
 						break;  // found it
 					}
@@ -78,13 +78,19 @@ int PartObj3D(pObj3D pobj, int plvl)  {
 
 				// Okay.  s1 and s2 now pointed at the right seg, so let's make the new vert if it's not there
 
-				if (sdone == NULL) {  // if we haven't already done the new vert
-
-					 	newvert[k] = pobj->addvert( DV_midpt(v1->v,	v2->v, center) );  // new vert
+				if (vdone == NULL) {  // if we haven't already done the new vert
+						vtemp = new Vert3D(DV_midpt(v1->v, v2->v, center));
+						pobj->vtail = vtemp;
+						vtemp->next = NULL;
+						newvert[k] = vtemp;
+//
+//  this wasn't working?
+//					 	newvert[k] = pobj->addvert( DV_midpt(v1->v,	v2->v, center) );  // new vert
+//
 					 	s1->vf = newvert[k];  // save it in seg structure for later
 					 	s2->vf = newvert[k];  //  on BOTH segs
 				}
-				else newvert[k] = sdone;
+				else newvert[k] = vdone;
 			}  		// end of k-loop (vertices for face j)
 			// all new verts made/found for this face, so...
 			//
