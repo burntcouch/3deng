@@ -33,10 +33,11 @@ int PartObj3D(pObj3D pobj, int plvl)  {
 	unsigned int fcnt;
 	unsigned int i, k;
 	pFace3D newface, fcurr, foldtail, ftmp;
-	pVert3D newvert[3], v1, v2, sdone;
+	pVert3D v1, v2, sdone;
+	pVert3D *newvert[3];
 	pSeg3D s1, s2, sdummy, ns;
 
-	dVECTOR center = pobj->center;
+	DVector center = pobj->center;
 
 	for (i = 0; i < plvl; i++) {   // Once for each level...
 
@@ -54,7 +55,7 @@ int PartObj3D(pObj3D pobj, int plvl)  {
 				v1 = fcurr->v[k];
 				v2 = fcurr->v[ (k + 1) % 3 ];   // stepping thru verts paired (0,1),(1,2),(3,0)
 					// does seg not exist?
-				sdummy = v1.addseg(v2);  // this builds the segs if they don't already exist
+				sdummy = v1->addseg(v2);  // this builds the segs if they don't already exist
 				s1 = v1->seg;
 				s2 = v2->seg;
 
@@ -79,7 +80,7 @@ int PartObj3D(pObj3D pobj, int plvl)  {
 
 				if (sdone == NULL) {  // if we haven't already done the new vert
 
-					 	newvert[k] = pobj->addvert( DV_MidPt(v1->v,	v2->v, center) );  // new vert
+					 	newvert[k] = pobj->addvert( DV_midpt(v1->v,	v2->v, center) );  // new vert
 					 	s1->vf = newvert[k];  // save it in seg structure for later
 					 	s2->vf = newvert[k];  //  on BOTH segs
 				}
@@ -91,7 +92,7 @@ int PartObj3D(pObj3D pobj, int plvl)  {
 
 			newface = pobj->addface();   // other info for new faces should be set, here...
 		  newface->rgb = fcurr->rgb;
-			newface->curve = fcurr->curve;
+			newface->curv = fcurr->curv;
 		  newface->v[0] = fcurr->v[0];
 		  newface->v[1] = newvert[0];
 		  newface->v[2] = newvert[2]; 
@@ -99,6 +100,7 @@ int PartObj3D(pObj3D pobj, int plvl)  {
 
 			newface = pobj->addface();
 		  newface->rgb = fcurr->rgb;
+			newface->curv = fcurr->curv;
 		  newface->v[0] = newvert[0];
 		  newface->v[1] = fcurr->v[1];
 		  newface->v[2] = newvert[1]; 
@@ -106,6 +108,7 @@ int PartObj3D(pObj3D pobj, int plvl)  {
 
 			newface = pobj->addface();
 		  newface->rgb = fcurr->rgb;
+			newface->curv = fcurr->curv;
 		  newface->v[0] = newvert[1];
 		  newface->v[1] = fcurr->v[2];
 		  newface->v[2] = newvert[2]; 
@@ -113,6 +116,7 @@ int PartObj3D(pObj3D pobj, int plvl)  {
 
 			newface = pobj->addface();
 		  newface->rgb = fcurr->rgb;
+			newface->curv = fcurr->curv;
 		  newface->v[0] = newvert[0];
 		  newface->v[1] = newvert[1];
 		  newface->v[2] = newvert[2]; 
@@ -127,7 +131,7 @@ int PartObj3D(pObj3D pobj, int plvl)  {
 		fcurr = pobj->fhead;
 		while (1) {
 			ftmp = fcurr->next;
-			fcurr->delete;
+			delete fcurr;
 			if (ftmp == foldtail) break;
 			fcurr = ftmp;
 		}
@@ -138,14 +142,14 @@ int PartObj3D(pObj3D pobj, int plvl)  {
 			s1 = v1->seg;
 			while (s1 != NULL) {
 				s2 = s1->next;
-				s1->delete;
+				delete s1;
 				s1 = s2;
 			}
 			v1->seg = NULL;
 			v1 = v1->next;
 		}
 		pobj->fhead = foldtail->next;	
-		foldtail->delete;
+		delete foldtail;
 	} 	// end of i-loop (levels)
 
 	return (fcnt); // return new count of faces

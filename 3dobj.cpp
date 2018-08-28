@@ -24,48 +24,108 @@ class XX {
 	~XX();
 };
 
-XX:XX() {}
-XX:~XX() {}
+typedef XX *pXX;
+
+XX::XX() {}
+XX::~XX() {}
 */
 
-// protos
-class Vert3D {};
-class Face3D {};
-class Seg3D {};
-class Obj3D {};
-class ObjList {};
-class ObjXdat {};
+// forward decs
+class Seg3D;
+class Vert3D;
+class Face3D;
+class Obj3D;
+class ObjXdat;
+class ObjList;
 
+typedef Seg3D *pSeg3D;
 typedef Vert3D *pVert3D;
 typedef Face3D *pFace3D;
-typedef Seg3D *pSeg3D;
 typedef Obj3D *pObj3D;
-typedef ObjList *pObjList;
 typedef ObjXdat *pObjXdat;
+typedef ObjList *pObjList;
 
-// Vert3D
-class Vert3D {
-	Vert3D();
-	Vert3D(DVector v);
-	~Vert3D();
+//*** Seg3D
+//
+class Seg3D {
+	public:
+		Seg3D();
+		Seg3D(Vert3D *otherv);
+		~Seg3D();
 
-	DVector v;
-	DVector * next;
-	Obj3D * obj;   // to get to top of vertlist, this->obj->vhead
-	Seg3D * seg;
-
-	Seg3D * addseg(Vect3D * nv);
-	void move(DVector p, bool abs);  // offset to new position; if abs true, absolute reposition
+		Vert3D *v;  	// to get to top of seglist, this->v1->seg
+		Vert3D *vf;  // don't know what this is for, yet...
+		Seg3D *next;	
 };
 
-Vert3D::Vert3D();
-Vert3D::~Vert3D();
+Seg3D::Seg3D() {}
+Seg3D::~Seg3D() {}
+
+Seg3D::Seg3D(pVert3D otherv) {
+	v = otherv;
+	vf = NULL;
+	next = NULL;
+}
+
+// end of Seg3D
+
+//*** Vert3D
+//
+class Vert3D {
+	public:
+		Vert3D();
+		Vert3D(DVector v);
+		~Vert3D();
+
+		DVector v;
+		DVector *next;
+		Obj3D *obj;   // to get to top of vertlist, this->obj->vhead
+		Seg3D *seg;
+
+		pSeg3D addseg(pVert3D nv);
+		void move(DVector p, bool abs);  // offset to new position; if abs true, absolute reposition
+			// vector function redirects
+		DVector	add(pVert3D bv);
+		DVector diff(pVert3D bv);
+		double mag();
+		double dot(pVert3D bv);
+		DVector mult(double m);
+		DVector cross(pVert3D bv);
+};
+
+Vert3D::Vert3D() {}
+Vert3D::~Vert3D() {}
 
 Vert3D::Vert3D(DVector nv) {
 	v = nv;
 	obj = NULL;
 	next = NULL;
 }
+
+DVector Vert3D::add(pVert3D bv) {
+	return v.add(bv->v);
+}
+
+DVector Vert3D::diff(pVert3D bv) {
+	return v.diff(bv->v);
+}
+
+double Vert3D::mag() {
+	return v.mag();
+}
+
+double Vert3D::dot(pVert3D bv) {
+	return v.dot(bv->v);
+}
+
+DVector Vert3D::cross(pVert3D bv) {
+	return v.cross(bv->v);
+}
+
+DVector Vert3D::mult(double m) {
+	return v.mult(m);
+}
+
 
 void Vert3D::move(DVector p, bool abs=false) {
 	if (abs) v = p;
@@ -79,7 +139,7 @@ pSeg3D Vert3D::addseg(pVert3D nv) {
 
 	asg = this->seg;
 	if (asg == NULL) {	// no segs for this vert yet so add it..
-		newseg1 = *new Seg3D(nv);
+		newseg1 = new Seg3D(nv);
 		this->seg = newseg1;
 		res = newseg1;
 	}
@@ -87,7 +147,7 @@ pSeg3D Vert3D::addseg(pVert3D nv) {
 		while (1) {
 			if (asg->v == nv) break;  // segment already here
 			if (asg->next == NULL) { // if aren't any more segs, add new seg
-				newseg1 = *new Seg3D(nv);
+				newseg1 = new Seg3D(nv);
 				this->seg = newseg1;
 				res = newseg1;
 				break;
@@ -98,7 +158,7 @@ pSeg3D Vert3D::addseg(pVert3D nv) {
 
 	asg = nv->seg;
 	if (asg == NULL) { // no segs here, so..
-		newseg2 = *new Seg3D(this);
+		newseg2 = new Seg3D(this);
 		nv->seg = newseg2;
 		res = newseg2;
 	}
@@ -106,7 +166,7 @@ pSeg3D Vert3D::addseg(pVert3D nv) {
 		while (1) {
 			if (asg->v == this) break;  //seg already there
 			if (asg->next == NULL) { // add a new one, then
-				newseg2 = *new Seg3D(this);
+				newseg2 = new Seg3D(this);
 				nv->seg = newseg2;
 				res = newseg2;
 				break;
@@ -120,31 +180,33 @@ pSeg3D Vert3D::addseg(pVert3D nv) {
 
 // Face3D
 class Face3D {
-	Face3D();
-	~Face3D();
 
-	Vert3D v[3];		// v0, v1, v2 will be CCW if visible face is pointing toward observer
-			//   so that v1-v0, v2-v1, and v0-v2 proceed in that diretion
- 			//   cross product (v1-v0) x (v2-v1) will yield the 'normal' 
-	Face3D * next;
-	Obj3D * obj;		 // to get to top of facelist, this->obj->fhead
-	bool visible;		 // default is yes
-	Colora rgb;      // color of face with alpha
-	DVector curv;  // 'curvature' center of face.  NULL if flat 	
+	public:
+		Face3D();
+		~Face3D();
 
-	DVector norm();
-	DVector center();
+		Vert3D *v[3];		// v0, v1, v2 will be CCW if visible face is pointing toward observer
+				//   so that v1-v0, v2-v1, and v0-v2 proceed in that diretion
+	 			//   cross product (v1-v0) x (v2-v1) will yield the 'normal' 
+		Face3D *next;
+		Obj3D *obj;		 // to get to top of facelist, this->obj->fhead
+		bool visible;		 // default is yes
+		Colora rgb;      // color of face with alpha
+		DVector curv;  // 'curvature' center of face.  NULL if flat 	
+
+		DVector norm();
+		DVector center();
 
 };
 
-Face3D:Face3D() {}
-Face3D:~Face3D() {}
+Face3D::Face3D() {}
+Face3D::~Face3D() {}
 
 DVector Face3D::norm() {
 	DVector tv1, tv2, resv;
 
-	tv1 = v[0].diff(v[1]);
-	tv2 = v[1].diff(v[2]);
+	tv1 = v[0]->diff(v[1]);
+	tv2 = v[1]->diff(v[2]);
 	resv = tv1.cross(tv2);
 	resv = resv.mult(1.0 / resv.mag());
 	return resv;
@@ -153,95 +215,85 @@ DVector Face3D::norm() {
 DVector Face3D::center() {
 	DVector tmpv;
 	
-	tmpv = v[0].add(v[1]);
-	tmpv = tmpv.add(v[2]);
+	tmpv = v[0]->add(v[1]);
+	tmpv = tmpv.add(v[2]->v);
 	tmpv = tmpv.mult(1 / 3.0);
 	return tmpv;
 }
 // end of Face3D
 
 
-// Seg3D
-class Seg3D {
-	Seg3D();
-	Seg3D(Vert3D * otherv);
-	~Seg3D();
-
-	Vert3D * v;  	// to get to top of seglist, this->v1->seg
-	Vert3D * vf;  // don't know what this is for, yet...
-	Seg3D * next;	
-};
-
-Seg3D:Seg3D() {}
-Seg3D:~Seg3D() {}
-
-Seg3D::Seg3D(Vert3D * otherv) {
-	v = otherv;
-	vf = NULL;
-	next = NULL;
-}
-// end of Seg3D
-
 //
-// ObjXdat
+//*** ObjXdat
 //
 class ObjXdat {
-	ObjXdat();
-	~ObjXdat();
+	public:
+		ObjXdat();
+		~ObjXdat();
 
-	Obj3D * obj;
-	double mass;
-	Obj3D * amass;
+		Obj3D *obj;
+		double mass;
+		Obj3D *amass;
 };
 
-ObjXdat:ObjXdat() {
+ObjXdat::ObjXdat() {
 	obj = NULL;
 	mass = -1.0;
 	amass = NULL;
 }
 
-ObjXdat:~ObjXdat() {}
+ObjXdat::~ObjXdat() {}
 
 //end of ObjXdat
 
-// Obj3D
+//*** Obj3D
+//
 class Obj3D {
-	Obj3D();
-	~Obj3D();
+	public:
+		Obj3D();
+		~Obj3D();
 
-	ObjList * list;  // top of the object list will be this->list->head (or ->tail)
-	Obj3D * next;   // NULL if we are at end of list
-	pVert3D vhead;
-	pVert3D vtail;  // points to last vertex added
-	pFace3D fhead;
-	pFace3D ftail;  // points to last face added
+		ObjList *list;  // top of the object list will be this->list->head (or ->tail)
+		Obj3D *next;   // NULL if we are at end of list
+		pVert3D vhead;
+		pVert3D vtail;  // points to last vertex added
+		pFace3D fhead;
+		pFace3D ftail;  // points to last face added
 
-	ObjXdat * xdat;		// extended 'physics' data
-	DVector center;		// current rotational center
-	DVector vel;			// current v of object
-	DVector ax;				// induced acc of object
-	DVector rot;			//rotation PERIOD (not rate) about axes
-	DVector rox[3];			//rotational axes 'i', 'j', 'k'
-	double lumin;			//luminosity unless <0
-	double refl;				// reflectance (default 1)
-	int df;					// drawing flags
-								// 0 - ignore this object 
-								// 1 - normal, 2 - deg.
-								// 4 - attached
-								// 8 - bitmap
-	Colora dcol;			// color of deg. object
-	double dsize;			// radius of deg. object
-	int lflag;				// Use as a light?
+		ObjXdat *xdat;		// extended 'physics' data
+		DVector center;		// current rotational center
+		DVector vel;			// current v of object
+		DVector ax;				// induced acc of object
+		DVector rot;			//rotation PERIOD (not rate) about axes
+		DVector rox[3];			//rotational axes 'i', 'j', 'k'
+		double lumin;			//luminosity unless <0
+		double refl;				// reflectance (default 1)
+		int df;					// drawing flags
+									// 0 - ignore this object 
+									// 1 - normal, 2 - deg.
+									// 4 - attached
+									// 8 - bitmap
+		Colora dcol;			// color of deg. object
+		double dsize;			// radius of deg. object
+		int lflag;				// Use as a light?
 
-		// other prototypes
-	void init_xdat()
-	pFace3D addface();
-	pVert3D addvert(DVector v);
+			// other prototypes
+		void init_xdat();
+		pFace3D addface();
+		pVert3D addvert(DVector v);
 
 };
 
 Obj3D::Obj3D() {}
 Obj3D::~Obj3D() {}
+
+void Obj3D::init_xdat() {
+	xdat = new ObjXdat();
+
+	xdat->obj = this;
+	xdat->mass = -1.0;
+	xdat->amass = NULL;
+}
 
 pVert3D Obj3D::addvert(DVector v) {
 	pVert3D vert;
@@ -262,15 +314,14 @@ pFace3D Obj3D::addface() {
 	pFace3D face;
 	pFace3D flink;
 	
-	face = *new Face3D;
+	face = new Face3D;
 	flink = this->ftail;
 	if (flink == NULL)  this->fhead = face;  // new object, no faces added yet
-	else  flink->nx = face;
+	else  flink->next = face;
 	this->ftail = face;
 	face->obj = this;
 	for (int i = 0; i < 3; i++) {
-		face->v[i] = *new Vert3D;
-		face->v[i] = NULL;
+		face->v[i] = new Vert3D;
 	}
 	face->rgb = ltGry;
 	face->next = NULL;
@@ -278,23 +329,24 @@ pFace3D Obj3D::addface() {
 }
 
 void Obj3D::init_xdat() {
-	xdat = *new ObjXdat();
+	xdat = new ObjXdat();
 
 }
 //end of Obj3D
 
 //
-// ObjList
+//*** ObjList
 //
 class ObjList {
-	ObjList();
-	~ObjList();
+	public:
+		ObjList();
+		~ObjList();
 
-	static Obj3D * head;
-	static Obj3D * tail;
-	static long ocount;
+		Obj3D *head;
+		Obj3D *tail;
+		long ocount;
 
-	pObj3D add(int xf, int otype);
+		pObj3D addobj(int xf, int otyp);
 };
 
 ObjList::ObjList() {}
@@ -307,15 +359,15 @@ pObj3D ObjList::addobj( int xf, int otyp ) {
 	
 	nobj = new Obj3D();
 
-	if (nobj != NULL) {
-		if (obja->head == NULL) {  // new object list
-			obja->head = nobj;
-			obja->tail= nobj;
+	if (nobj) {
+		if (head == NULL) {  // new object list
+			head = nobj;
+			tail= nobj;
 		}
 		else {
-			ntlo = obja->tail;
+			ntlo = tail;
 			ntlo->next = nobj;
-			obja->tail = nobj;
+			tail = nobj;
 		}
 
 		switch (xf) {

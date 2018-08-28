@@ -27,8 +27,8 @@
 
 // protos?
 
-class Env3D {};
-class Disp3D {};
+class Env3D;
+class Disp3D;
 
 typedef Env3D *pEnv3D;
 typedef Disp3D *pDisp3D;
@@ -48,8 +48,8 @@ class Env3D {
 		DVector ojv;						// +j is 'left'
 		DVector okv;						// +k is 'up'
 
-		ObjList * olist;				// object list
-		Objlist * lites;				// lights	list
+		ObjList *olist;				// object list
+		Obj3D *lites;				// lights	list
 		double lvc;		  				// lighting range scale: 5 typical
 		double lvr;		  				// lighting range: 32 typical
 		bool liteson;		  			// do lighting? if not, use Ghod shading
@@ -78,8 +78,8 @@ class Disp3D {
 		int vScrn;	 	  // vertical view res. (clip region)
 		double vscal;		  // pixels per meter -- 1.875 * 2 * hScrn 
 
-		SDL_Renderer * render;		// renderer struct
-		SDL_Window * window;			// window struct
+		SDL_Renderer *render;		// renderer struct
+		SDL_Window *window;			// window struct
 
 		XYCrd mouse;							// last mouse position
 		int key;							// last key
@@ -93,26 +93,26 @@ class Disp3D {
 	
 	protected:
 
-}
+};
 
 Disp3D::Disp3D() {
 	winsize.x = 1024;
 	winsize.y = 600;
 	delta = 1.0;
-	hScrn = ;
-	vScrn = ;
-	vscal = ;
+	hScrn = winsize.x / 2;
+	vScrn = winsize.y / 2;
+	vscal = 1.875 * 2 * (double) hScrn;
 	
 	tscale = 1.0;
 	frcnt = 0;
 	frate = 0.0;
-	fskip = 0;
+	fskip = 4;
 
 	startTime = SDL_GetTicks();
-	srand((Time(NULL) * startTime) / 997); 
+	srand((time(NULL) * startTime) / 997); 
 }
 
-~Disp3D::Disp3D() {}
+Disp3D::~Disp3D() {}
 
 // Z-sort array declaration and qsort compare function
 
@@ -121,7 +121,7 @@ struct _zsort3D;
 typedef struct _zsort3D {
 	double z;
 	float zc;
-	p3DFace zf;
+	pFace3D zf;
 } _ZS3D;
 
 typedef _ZS3D *pZS3D;
@@ -165,7 +165,6 @@ int ZSCompS2( const void * a, const void * b) {
 	if (fa == fb) res = 0; 
 	return res;
 }
-
 
 #endif
 // end of 3ddisp.cpp
