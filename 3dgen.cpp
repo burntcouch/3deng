@@ -24,6 +24,8 @@
 #ifndef __3DGEN
 #define __3DGEN 1
 
+int PartObj3D(pObj3D pobj, int plvl);  // partition a defined object into 4 faces per face
+
 //
 // Partition an object into 4 faces/per face
 //

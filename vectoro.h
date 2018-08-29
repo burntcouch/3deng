@@ -16,7 +16,11 @@
 //#define __DVECTOR 1
 
 #ifndef PI
-#define PI 3.1415926535898
+#define PI 3.14159265358979323846
+#endif
+
+#ifndef PI_L
+#define PI_L 3.141592653589793238462643383279502884L
 #endif
 
 using namespace std;

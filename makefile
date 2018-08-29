@@ -2,6 +2,7 @@
 #  --- working makefile
 #
 3DCURRVER = 0.505
+SDL3DVER = 03
 SDLLIBS = -lSDL2 -lSDL2_gfx -lm
 
 ifdef 3DVER
@@ -12,6 +13,12 @@ touchall: *.c *.cpp *.h
 	touch *.c; \
 	touch *.cpp; \
 	touch *.h
+
+sdlbu: sdlprog.cpp sdl3d.cpp sdlprog sdl3d
+	cp sdl3d.cpp ./test/sdl3d$(SDL3DVER).cpp; \
+	cp sdl3d ./test/sdl3d$(SDL3DVER); \
+	cp sdlprog.cpp ./test/sdlprog$(SDL3DVER).cpp; \
+	cp sdlprog ./test/sdlprog$(SDL3DVER) 
 
 dist: *.c *.cpp *.h *.rtf README* LICENSE* makefile
 	tar czf ./distarch/3DEsdl.$(3DCURRVER).tar.gz \

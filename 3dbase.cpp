@@ -1,7 +1,7 @@
 //
 // 3dbase.cpp
 //
-// base objects for rendering
+// base objects, structs, and functions for rendering
 //
 
 #include <SDL2/SDL.h>
@@ -9,19 +9,11 @@
 
 #ifndef __3DBASE
 #define __3DBASE 1
+#include "3dbase.h"
 
 //
 // XYCrd - convenience object for SDL rendering
 //
-
-class XYCrd {
-	public:
-		XYCrd();
-		XYCrd(int ix, int iy);
-		~XYCrd();
-		int x;
-		int y;
-};
 
 //defs 
 XYCrd::XYCrd() {
@@ -38,19 +30,6 @@ XYCrd::~XYCrd() {}
 //
 // *** Colora - convenience object to handle color in rendering
 //
-
-class Colora {
-	public:
-		Colora();
-		Colora(unsigned int ir, unsigned int ig, unsigned int ib, unsigned int ia);
-		~Colora();
-		unsigned int r, g, b, a;
-
-		void fade(int howmuch);
-		void bright(int howmuch);
-};
-
-void clear_to_Colora(SDL_Renderer * r, Colora c);
 
 // defs
 void Colora::fade(int howmuch = 10) {
@@ -102,16 +81,6 @@ void clear_to_Colora(SDL_Renderer * r, Colora c) {  // clear r to color c
 //
 // *** Trig3D - convenience object for SDL rendering
 //
-class Trig3D {
-	public:
-		Trig3D();
-		~Trig3D();
-		void push(XYCrd * apoint);
-		void move(int x, int y);
-		
-		Colora color;
-		XYCrd pts[3];		
-};
 
 Trig3D::Trig3D() {
 	for(int i = 0; i < 3; i++) pts[i] = XYCrd(0, 0);
@@ -130,7 +99,6 @@ void Trig3D::move(int x, int y) {
 }
 
 // a wrapper to draw this stuff easier
-void draw_Trig3D(SDL_Renderer * renderer, Trig3D *trid);
 
 void draw_Trig3D(SDL_Renderer * r, Trig3D *trid) {
 
@@ -140,6 +108,40 @@ void draw_Trig3D(SDL_Renderer * r, Trig3D *trid) {
 			trid->color.r, trid->color.g, trid->color.b, trid->color.a);
 }
 
+// qsort compare functions for z-sorts (protos and structs in 3dbase.h)
+//
+
+int ZSCompS(pZS3D zarr, const void * a, const void * b) {
+  long ia, ib;
+	double fa, fb;
+	int res;
+
+	ia = *(long *)a;
+	ib = *(long *)b;
+	fa = zarr[ia]->z;
+	fb = zarr[ia]->z;
+	if ((fa - fb) > 0) res = 1;
+	else res = - 1;
+	if (fa == fb) res = 0; 
+	return res;
+}
+
+int ZSCompS2(const void * a, const void * b) {
+   	_ZS3D ia, ib;
+	double fa, fb;
+	int res;
+
+	ia = *(_ZS3D *)a;
+	ib = *(_ZS3D *)b;
+	fa = ia.z;
+	fb = ib.z;
+	if ((fa - fb) > 0) res = 1;
+	else res = - 1;
+	if (fa == fb) res = 0; 
+	return res;
+}
+
 
 #endif
 // end of 3dbase.cpp
+//

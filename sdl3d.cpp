@@ -12,11 +12,7 @@
 #include <SDL2/SDL2_gfxPrimitives.h>  // for, uh, drawing primitives.  filledTrigonRGBA for one...
 //  and don't forget the -lSDL2_gfx library, either...
 
-#include "vectoro.cpp"   // DVector object and functions
-#include "3dbase.cpp"    // XYCrd, Colora, Trig3D objects
-#include "3ddisp.cpp"    // Env3D, Disp3D objects
-#include "3dobj.cpp"		 // Face3D, Seg3D, Vert3D, Obj3D, ObjList objects
-#include "3dgen.cpp"		 // object generation functions
+#include "3dmaster.h"   // see this file for what all is where...
 
 // gotcha #2 -- add this line to keep from having to use 'std::cout' below instead of just 'cout'
 using namespace std;
