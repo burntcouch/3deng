@@ -943,11 +943,8 @@ int DrawZS3D(p3DEnv wenv, p3DObjA wobj) {
 			  else {
 				nv = dNorm(tva, tvb, tvc);
 				lscol = face->rgb;
-				if (objr->lumin > -100) lscol = 
-					LtShade3D(lscol, wenv, nv, zv,
-					objr->lumin);
-				else lscol = FcShade3D(lscol, wenv, nv, zv, 
-					objr->refl); 
+				if (objr->lumin > -100) lscol = LtShade3D(lscol, wenv, nv, zv, objr->lumin);
+				else lscol = FcShade3D(lscol, wenv, nv, zv, objr->refl); 
 				vcol = gl_rgbcolor(lscol.r, lscol.g, lscol.b);
 			  }
 			}

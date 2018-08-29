@@ -13,7 +13,14 @@ class XYCrd {
 		~XYCrd();
 		int x;
 		int y;
+		bool offscrn;
 };
+
+XYCrd::XYCrd() {
+	x = 0;
+	y = 0;
+	offscrn = false;
+}
 
 //
 //*** Colora - convenience object to handle color in rendering
@@ -56,20 +63,20 @@ void draw_Trig3D(SDL_Renderer * renderer, Trig3D *trid);  // a wrapper to draw t
 class ZS3D;
 typedef ZS3D pZS3D;
 
-class ZS3D {
+class ZS3D {   // what we are sorting
 	public:
 		ZS3D();
 		~ZS3D(); 
 	
 		double z;
-		pFace3D zf;		
-
+		void *zf;
+		double zc;		
 };
 
 ZS3D::ZS3D() {}
 ZS3D::~ZS3D() {}
 
-long *ZSX;
+ZS3D *Zarr;   // the global zsort array
 
 // qsort compare function prototypes for z-sorting
 

@@ -110,31 +110,17 @@ void draw_Trig3D(SDL_Renderer * r, Trig3D *trid) {
 
 // qsort compare functions for z-sorts (protos and structs in 3dbase.h)
 //
-
-int ZSCompS(pZS3D zarr, const void * a, const void * b) {
+//  notice that this DEPENDS on the declaration of "ZS3D *Zarr;" in the header file
+//
+int ZSCompS(const void * a, const void * b) {
   long ia, ib;
 	double fa, fb;
 	int res;
 
 	ia = *(long *)a;
 	ib = *(long *)b;
-	fa = zarr[ia]->z;
-	fb = zarr[ia]->z;
-	if ((fa - fb) > 0) res = 1;
-	else res = - 1;
-	if (fa == fb) res = 0; 
-	return res;
-}
-
-int ZSCompS2(const void * a, const void * b) {
-   	_ZS3D ia, ib;
-	double fa, fb;
-	int res;
-
-	ia = *(_ZS3D *)a;
-	ib = *(_ZS3D *)b;
-	fa = ia.z;
-	fb = ib.z;
+	fa = Zarr[ia].z;
+	fb = Zarr[ia].z;
 	if ((fa - fb) > 0) res = 1;
 	else res = - 1;
 	if (fa == fb) res = 0; 
