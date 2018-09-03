@@ -86,47 +86,70 @@ Trig3D::Trig3D() {
 	for(int i = 0; i < 3; i++) pts[i] = XYCrd(0, 0);
 }
 
+Trig3D::Trig3D(XYCrd p1, XYCrd p2, XYCrd p3) {
+	pts[0] = p1;
+	pts[1] = p2;
+	pts[2] = p3;
+}
+
+Trig3D::Trig3D(XYCrd p1) {
+	pts[0] = p1;
+	pts[1] = XYCrd(-9999, -9999);
+	pts[2] = XYCrd(-9999, -9999);
+}
+
 Trig3D::~Trig3D() {}
 
-void Trig3D::push(XYCrd * apoint) {
+void Trig3D::push(XYCrd apoint) {
 	pts[2] = pts[1];
 	pts[1] = pts[0];
-	pts[0] = *apoint;
+	pts[0] = apoint;
 }
 
 void Trig3D::move(int x, int y) {
 	for(int i = 0; i < 3; i++) {pts[i].x += x; pts[i].y += y;}
 }
 
-// a wrapper to draw this stuff easier
+// a wrapper to draw this stuff in SDL
 
 void draw_Trig3D(SDL_Renderer * r, Trig3D *trid) {
-
+//
 	filledTrigonRGBA(r, trid->pts[0].x, trid->pts[0].y, 
 			trid->pts[1].x, trid->pts[1].y, 
 			trid->pts[2].x, trid->pts[2].y,
 			trid->color.r, trid->color.g, trid->color.b, trid->color.a);
+//
 }
 
-// qsort compare functions for z-sorts (protos and structs in 3dbase.h)
-//
-//  notice that this DEPENDS on the declaration of "ZS3D *Zarr;" in the header file
-//
-int ZSCompS(const void * a, const void * b) {
-  long ia, ib;
-	double fa, fb;
-	int res;
-
-	ia = *(long *)a;
-	ib = *(long *)b;
-	fa = Zarr[ia].z;
-	fb = Zarr[ia].z;
-	if ((fa - fb) > 0) res = 1;
-	else res = - 1;
-	if (fa == fb) res = 0; 
-	return res;
+bool Trig3D::pixel() { // is this just one pixel?
+	return ( (pts[1].x == -9999 && pts[1].y == -9999 && pts[2].x == -9999 && pts[2].y == -9999) ? true : false );
 }
 
+void Trig3D::pixelize(int p) { // convert to one pixel
+	if (p >= 0 && p < 3) pts[0] = pts[p];
+	pts[1] = XYCrd(-9999, -9999);
+	pts[2] = XYCrd(-9999, -9999);	
+}
+
+long Trig3D::area() {
+	int y[3];   // indexes of sorted points
+	double tempa = 0.0;
+
+	y[0] = 0; // sort points by y-value
+	if (pts[0].y > pts[1].y) { y[0] = 1; y[1] = 0; }
+	else y[1] = 1;
+	if (pts[2].y > pts[y[1]].y) y[2] = 2;
+	else {
+		if (pts[2].y < pts[y[0]].y) { y[2] = y[1]; y[1] = y[0]; y[0] = 2; }
+		else { y[2] = y[1]; y[1] = 2; }
+	}
+		// find areas of two sub-triangles
+	double invslope = (double) (pts[y[0]].x - pts[y[2]].x) / (pts[y[0]].y - pts[y[2]].y);
+	double midwid = abs( pts[y[1]].x - ( pts[y[0]].x + invslope * ( pts[y[0]].y - pts[y[1]].y ) ) );
+	tempa = abs(pts[y[0]].y - pts[y[1]].y) * midwid / 2;
+	tempa += abs(pts[y[1]].y - pts[y[2]].y) * midwid / 2; 
+	return = (long) *(tempa + 0.5);
+}
 
 #endif
 // end of 3dbase.cpp

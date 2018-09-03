@@ -68,13 +68,35 @@ class Disp3D {
 
 };
 
+class V2Screen;
+typedef V2Screen *pV2Screen;
+
+class V2Screen {
+	public:
+		V2Screen();
+		~V2Screen();
+		
+		pFace3D face;
+		pTrig3D trig;
+		long area;
+		bool behind;
+		double toward;
+		int offscrn;
+};
+
 #define ZSTART 100
 #define ZGROW 100
 
 // qsort compare function prototypes for z-sorting
 
-int ZSCompS(const void * a, const void * b);
-pV2Screen vec3D_to_screen(pEnv3D wenv, DVector v1, DVector v2, DVector v3);
-int draw_Zsort(pEnv3D wenv);
+int ZSCompS(const void * a, const void * b);  // the compare function
+
+pV2Screen vec3D_to_screen(pEnv3D wenv, pFace3D f); // converting a face to a screen trigon
+
+bool vec_to_screen(pEnv3D wenv, DVector v, XYCrd *xy); // convert one object position vector to a pixel
+
+int draw_Zsort(pEnv3D wenv);  // do the z-sort and draw
+
+int draw_Wire(pEnv3D wenv);  // draw a wire frame of all
 
 // end of 3ddisp.h

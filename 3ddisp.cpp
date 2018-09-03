@@ -81,25 +81,15 @@ class ZS3D {   // what we are sorting
 ZS3D::ZS3D() {}
 ZS3D::~ZS3D() {}
 
-class V2Screen;
-typedef V2Screen *pV2Screen;
 
-class V2Screen {
-	public:
-		V2Screen();
-		~V2Screen();
-		
-		pFace3d face;
-		XYCrd scrxy[3];
-		long area;
-		bool behind;
-};
 
 V2Screen::V2Screen() {
 	face = NULL;
 	area = 0;
 	behind = false;
 }
+
+V2Screen::~V2Screen() {}
 
 // qsort compare functions for z-sorts (protos and structs in 3dbase.h)
 //  dependent on 
@@ -112,19 +102,58 @@ int ZSCompS(const void * a, const void * b) {
 	return ((fa - fb) > 0) ? 1 : ((fa == fb) ? 0 : -1);
 }
 
+// vector to coordinate math
+bool vec_to_screen(pEnv3D wenv, DVector v, pXYCrd xy) {
+	double alim = 3.0 * PI / 4.0;
+	int offs = 0;
+	int slack = 20;
+	DVector tmpv = v.diff(wenv->opos);
+	double pr = tmpv.mag();
+	double ia = wenv->oiv.dot(tmpv);
+	double ja = wenv->ojv.dot(tmpv);
+	double ka = wenv->okv.dot(tmpv);
+	double pt = atan(fabs(ja/ia));
 
-pV2Screen vec3D_to_screen(pEnv3D wenv, pFace3D f, DVector v1, DVector v2, DVector v3) {
-	pV2Screen res;
+	if (ia < 0) pt = PI - pt;
+	if (ja < 0) pt = -pt;
+	pp = asin(ka/pr);
+		// angle limiter for horiz.
+	if (pt > alim) pt = alim;
+	if (pt < -alim) pt = -alim;
+	fx = -wenv->vscal * pt;
+	fy = wenv->vscal * pp;
+	offs = ((fabs(fx) > wenv->hScrn + slack) && (fabs(fy) > wenv->vScrn + slack)) ? 1 : 0;
+	xy->x = (int) fx +  wenv->hScrn;
+	xy->y = wenv->vScrn - (int) fy;
 
-	res = new V2Screen;
+	return offs;
+}
+
+
+// face to trigon math
+pV2Screen vec3D_to_screen(pEnv3D wenv, pFace3D f) {
+	pV2Screen res = new V2Screen;
+	pXYCrd xy = new XYCrd[3];
+	DVector zv, cv, nv;
+	int offscrn = 0;
+	double tempa = 0.0;
+
+	zv = (face->center()).diff(wenv->opos);
+	cv = zv.unit();
+	nv = face->norm();
+	res->toward = cv.dot(nv); //toward < 0, face is 'toward'
+	res->behind = zv.dot(wenv->oiv);  // behind > 0, face is 'ahead'
 
 	res->face = f;
-	res->scrxy[0] = ;
-	res->scrxy[1] = ;
-	res->scrxy[2] = ;
-	res->area =  ;
-	res->behind =  ;
-	
+	for (int i = 0; i < 3; i++) {
+		offscrn = vec_to_screen(wenv, f->v[0], &xy[0]);
+		offscrn += vec_to_screen(wenv, f->v[1], &xy[1]);
+		offscrn += vec_to_screen(wenv, f->v[2], &xy[2]);
+	}
+	res->trig = new Trig3D(xy[0], xy[1], xy[2]);
+	res->area = res->trig.area();
+	res->offscrn = offscrn;
+
 	return res;
 } 
 
@@ -133,12 +162,10 @@ pV2Screen vec3D_to_screen(pEnv3D wenv, pFace3D f, DVector v1, DVector v2, DVecto
 int draw_Zsort(pEnv3D wenv) {
 	// allocate stuff for z-sorts
 	int res;
+	pV2Screen scrn_tg;
 
 	long zcnt, zi = 0;
 	pObj3D objlink;
-	DVector zv, cv, nv;
-	double d1, d2, d3;
-
 	std::vector<pZS3D> ZX;
 
 	ZX.resize(zcnt);
@@ -151,58 +178,38 @@ int draw_Zsort(pEnv3D wenv) {
 			case 1: { // not degenerate
 			  face = objlink->fhead;
 			  while (face != NULL) {
-					zv = (face->center()).diff(wenv->opos);
-					cv = zv.unit();
-					nv = face->norm();
-
-					d1 = cv.dot(nv);
-					if (d1 < 0) {    // face is toward view.  
-													 // check if it is okay to render the back of the face here, too, someday...
-						d2 = zv.dot(wenv->oiv);
-						if (d2 > 0) {  // center of face is 'ahead' of viewer, so...
-							XYCrd vc1 = vec3D_to_screen(wenv, face->v[0].v);
-							int svf =  vc1.offscrn ? 1 : 0;
-							XYCrd vc2 = vec3D_to_screen(wenv, face->v[1].v);   // 'flag' is set if XYCrd is off the screen
-							svf += vc2.offscrn ? 1 : 0;
-							XYCrd vc3 = vec3D_to_screen(wenv, face->v[2].v);
-							svf += vc3.offscrn ? 1 : 0;
-
-
-							  // check size of polygon..
-							  // if vc4 x+y < 2 is just a pixel
-							int dx = abs(vc1.x - vc2.x) + abs(vc2.x - vc3.x) + abs(vc1.y - vc2.y) + abs(vc2.y - vc3.y);
-
-							if (svf != 3) {
-						    d3 = sqrt(-d1);
-						    if (dx < 2) d3 += 1.0;
-								ZX[zi] = new ZS3D;
-								ZX[zi]->z = d2;
-								ZX[zi]->zc = d3;  // this is ???
-								ZX[zi]->zf = face;
-								zi++;
-							}
-						}
+					scrn_tg = vec3D_to_screen(wenv, face);
+					if (scrn_tg->toward < 0 && scrn_tg->behind > 0 && !scrn_tg->offscrn) {    // face is toward view.  
+				    double d3 = sqrt(-(scrn_tg->toward));
+				    if (scrn_tg->area < 4) d3 += 1.0;
+						ZX[zi] = new ZS3D;
+						ZX[zi]->tg = scrn_tg;
+						ZX[zi]->z = scrn_tg->behind;
+						ZX[zi]->zc = d3;  // this is acos of angle between observer and normal of face?
+						ZX[zi]->zf = face;
+						zi++;
 					}
 					face = face->next;
 				}	
 			  break;
-			case 2: {   // degenerate?		
-				zv = (objlink->center).diff(wenv->opos);
-				d2 = zv.dot(wenv->oiv);
-				if (d2 > 0) {  // in front of viewer, that is
-				if (ft2 > 0) {
-					vc1 = Screen3Dr(wenv, zv);  // STILL hafta find out what this is...
-					if (!vc1.flag) {   					// still don't know
+			case 2: {   // degenerate case
+				DVector zv = (objlink->center).diff(wenv->opos);
+				double d2 = zv.dot(wenv->oiv);
+				if (d2 > 0) {  // in front of viewer, so...
+					xy = new XYCrd;
+					bool vc = vec_to_screen(wenv, zv, &xy);
+					if (!vc) {   					// as long as it is on screen
 						ZX[zi] = new ZS3D;
+						ZX[zi]->tg = new Trig3D(xy);
 						ZX[zi]->z = d2;
-					  ZX[zi]->zc = 1.0;        // and this?
-					  ZX[zi]->zf = objlink->fhead;
+						ZX[zi]->zc = 1.0;        // and this?
+						ZX[zi]->zf = objlink->fhead;
 						zi++;
 					}
 					face = face->next;					
 				}
 			}
-			case 0:
+			case 0:   // disabled face, don't draw
 			default: break;
 		}  // end of switch
 		// check to see if we need to resize yet
