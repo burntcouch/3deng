@@ -159,15 +159,15 @@ pV2Screen vec3D_to_screen(pEnv3D wenv, pFace3D f) {
 
 // Z-sort routine
 
-int draw_Zsort(pEnv3D wenv) {
+long draw_Zsort(pEnv3D wenv) {
 	// allocate stuff for z-sorts
-	int res;
 	pV2Screen scrn_tg;
 
 	long zcnt, zi = 0;
 	pObj3D objlink;
 	std::vector<pZS3D> ZX;
 
+	zcnt = ZSTART;
 	ZX.resize(zcnt);
 
 	// find out what faces need to be rendered and sorted
@@ -183,9 +183,9 @@ int draw_Zsort(pEnv3D wenv) {
 				    double d3 = sqrt(-(scrn_tg->toward));
 				    if (scrn_tg->area < 4) d3 += 1.0;
 						ZX[zi] = new ZS3D;
-						ZX[zi]->tg = scrn_tg;
+						ZX[zi]->tg = scrn_tg;  // save the coordinates
 						ZX[zi]->z = scrn_tg->behind;
-						ZX[zi]->zc = d3;  // this is acos of angle between observer and normal of face?
+						ZX[zi]->zc = d3;  // acos of angle between LOS to observer and normal of face, I think
 						ZX[zi]->zf = face;
 						zi++;
 					}
@@ -200,9 +200,9 @@ int draw_Zsort(pEnv3D wenv) {
 					bool vc = vec_to_screen(wenv, zv, &xy);
 					if (!vc) {   					// as long as it is on screen
 						ZX[zi] = new ZS3D;
-						ZX[zi]->tg = new Trig3D(xy);
+						ZX[zi]->tg = new Trig3D(xy);  // save the coordinates
 						ZX[zi]->z = d2;
-						ZX[zi]->zc = 1.0;        // and this?
+						ZX[zi]->zc = 1.0;        // assumes that face is fully illuminated
 						ZX[zi]->zf = objlink->fhead;
 						zi++;
 					}
@@ -214,8 +214,7 @@ int draw_Zsort(pEnv3D wenv) {
 		}  // end of switch
 		// check to see if we need to resize yet
 		if (zi - zcnt < 5) {
-			zcnt += zcnt + ZGROW
-			Zarr.resize(zcnt);
+			zcnt += zcnt + ZGROW;
 			ZX.resize(zcnt);
 		}
 		objlink = objlink->next;
@@ -225,19 +224,17 @@ int draw_Zsort(pEnv3D wenv) {
 	qsort(ZX.data(), zi, sizeof(pZS3D), ZSCompS);
 
 	for (long fi = zi-1; fi > -1; fi--) {   // draw 'em backwards
-		Face3D *drawface = (Face3D *) Zarr[ZSX[fi]].zf;
+		Face3D *drawface = ZX[fi]->zf;
 		
 		objlink = drawface->obj;
-		pflag = 0;   // 'pixel flag'; if drawn face is small enough, just draw a pixel
+		bool pflag = false;   // 'pixel flag'; if drawn face is small enough, just draw a pixel
 
-		
+		// TO DO:  lighting calcs and drawing
+		//  three cases: degerate large, degerate pixel || face pixel, or regular face
 	
 	}
 
-	Zarr.resize(ZGROW);   // do we want to cache some data?
-	ZX.resize(0);
-
-	return res;
+	return zi;
 }
 
 
