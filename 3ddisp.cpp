@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <iostream>
+#include <vector>  // for resizeable arrays in the z-sort stuff
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 
@@ -59,10 +60,73 @@ Disp3D::Disp3D() {
 
 Disp3D::~Disp3D() {}
 
-XYCrd vec3D_to_screen(pEnv3D wenv, DVector v) {   // FLESH THIS OUT
 
+
+// Z-sort array declaration and qsort compare function
+
+
+class ZS3D;
+typedef ZS3D pZS3D;
+
+class ZS3D {   // what we are sorting
+	public:
+		ZS3D();
+		~ZS3D(); 
+	
+		double z;
+		pFace3D zf;
+		double zc;		
+};
+
+ZS3D::ZS3D() {}
+ZS3D::~ZS3D() {}
+
+class V2Screen;
+typedef V2Screen *pV2Screen;
+
+class V2Screen {
+	public:
+		V2Screen();
+		~V2Screen();
+		
+		pFace3d face;
+		XYCrd scrxy[3];
+		long area;
+		bool behind;
+};
+
+V2Screen::V2Screen() {
+	face = NULL;
+	area = 0;
+	behind = false;
 }
 
+// qsort compare functions for z-sorts (protos and structs in 3dbase.h)
+//  dependent on 
+//
+int ZSCompS(const void * a, const void * b) {
+  double fa, fb;
+
+	fa = (*(ZS3D *)a)->z;
+	fb = (*(ZS3D *)b)->z;
+	return ((fa - fb) > 0) ? 1 : ((fa == fb) ? 0 : -1);
+}
+
+
+pV2Screen vec3D_to_screen(pEnv3D wenv, pFace3D f, DVector v1, DVector v2, DVector v3) {
+	pV2Screen res;
+
+	res = new V2Screen;
+
+	res->face = f;
+	res->scrxy[0] = ;
+	res->scrxy[1] = ;
+	res->scrxy[2] = ;
+	res->area =  ;
+	res->behind =  ;
+	
+	return res;
+} 
 
 // Z-sort routine
 
@@ -71,15 +135,13 @@ int draw_Zsort(pEnv3D wenv) {
 	int res;
 
 	long zcnt, zi = 0;
-	long *ZX;
-
 	pObj3D objlink;
 	DVector zv, cv, nv;
 	double d1, d2, d3;
 
-	zcnt = wenv->zcnt();     // NEED TO WRITE THIS function...and need to start using <vector> apparently...
-	Zarr = new ZS3D[zcnt];
-	ZX = new long[zcnt];
+	std::vector<pZS3D> ZX;
+
+	ZX.resize(zcnt);
 
 	// find out what faces need to be rendered and sorted
 
@@ -99,25 +161,24 @@ int draw_Zsort(pEnv3D wenv) {
 						d2 = zv.dot(wenv->oiv);
 						if (d2 > 0) {  // center of face is 'ahead' of viewer, so...
 							XYCrd vc1 = vec3D_to_screen(wenv, face->v[0].v);
-							svf =  vc1.offscrn ? 1 : 0;
+							int svf =  vc1.offscrn ? 1 : 0;
 							XYCrd vc2 = vec3D_to_screen(wenv, face->v[1].v);   // 'flag' is set if XYCrd is off the screen
 							svf += vc2.offscrn ? 1 : 0;
 							XYCrd vc3 = vec3D_to_screen(wenv, face->v[2].v);
 							svf += vc3.offscrn ? 1 : 0;
+
+
 							  // check size of polygon..
 							  // if vc4 x+y < 2 is just a pixel
-							XYCrd vc4;
-							vc4.x = abs(vc1.x - vc2.x) + abs(vc2.x - vc3.x);
-							vc4.y = abs(vc1.y - vc2.y) + abs(vc2.y - vc3.y);
+							int dx = abs(vc1.x - vc2.x) + abs(vc2.x - vc3.x) + abs(vc1.y - vc2.y) + abs(vc2.y - vc3.y);
 
 							if (svf != 3) {
 						    d3 = sqrt(-d1);
-						    if ((vc4.x + vc4.y) < 2) d3 += 1.0;
-								Zarr[zi].z = d2;
-								Zarr[zi].zc = d3;  // this is ???
-								Zarr[zi].zf = face;
-								ZX[zi] = zi;
-						
+						    if (dx < 2) d3 += 1.0;
+								ZX[zi] = new ZS3D;
+								ZX[zi]->z = d2;
+								ZX[zi]->zc = d3;  // this is ???
+								ZX[zi]->zf = face;
 								zi++;
 							}
 						}
@@ -132,10 +193,10 @@ int draw_Zsort(pEnv3D wenv) {
 				if (ft2 > 0) {
 					vc1 = Screen3Dr(wenv, zv);  // STILL hafta find out what this is...
 					if (!vc1.flag) {   					// still don't know
-						Zarr[zi].z = d2;
-					  Zarr[zi].zc = 1.0;        // and this?
-					  Zarr[zi].zf = objlink->fhead;
-						ZX[zi] = zi;
+						ZX[zi] = new ZS3D;
+						ZX[zi]->z = d2;
+					  ZX[zi]->zc = 1.0;        // and this?
+					  ZX[zi]->zf = objlink->fhead;
 						zi++;
 					}
 					face = face->next;					
@@ -144,11 +205,17 @@ int draw_Zsort(pEnv3D wenv) {
 			case 0:
 			default: break;
 		}  // end of switch
+		// check to see if we need to resize yet
+		if (zi - zcnt < 5) {
+			zcnt += zcnt + ZGROW
+			Zarr.resize(zcnt);
+			ZX.resize(zcnt);
+		}
 		objlink = objlink->next;
 	} // end of while
 
 	// and by-em-by we will do...
-	qsort(ZX, zi, sizeof(long), ZSCompS);
+	qsort(ZX.data(), zi, sizeof(pZS3D), ZSCompS);
 
 	for (long fi = zi-1; fi > -1; fi--) {   // draw 'em backwards
 		Face3D *drawface = (Face3D *) Zarr[ZSX[fi]].zf;
@@ -160,8 +227,8 @@ int draw_Zsort(pEnv3D wenv) {
 	
 	}
 
-	delete[] Zarr;   // do we want to cache some data?
-	delete[] ZX;
+	Zarr.resize(ZGROW);   // do we want to cache some data?
+	ZX.resize(0);
 
 	return res;
 }

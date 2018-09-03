@@ -2,30 +2,13 @@
 // quicksort test
 //
 
-
 #include <iostream>
-#include <stdlib.h>
-#include <stdio.h>
+#include <vector>
 
 #define ZASIZE 25
 
-class ZD;
-typedef ZD pZD;
-
 class Stuff;
-typedef Stuff pStuff;
-
-class ZD {
-	public:
-		ZD();
-		~ZD();
-
-		double z;
-		void *ix;
-};
-
-ZD::ZD() { z = 0.0; ix = NULL;}
-ZD::~ZD() {}
+typedef Stuff *pStuff;
 
 class Stuff {
 	public:
@@ -40,61 +23,40 @@ Stuff::Stuff() { d = (double) (rand() / RAND_MAX); }
 Stuff::~Stuff() {}
 
 
-ZD *zarr;
-
 int main(void);
 int ZComp(const void *a, const void *b);
 
 int ZComp(const void *a, const void *b) {
-	long ia, ib;
 	double fa, fb;
 	int res;
 
-	ia = *(long *)a;
-	ib = *(long *)b;
-	fa = zarr[ia].z;
-	fb = zarr[ib].z;
-	if ((fa - fb) > 0) res = 1;
-	else res = - 1;
-	if (fa == fb) res = 0; 
+	fa = (*(pStuff *)a)->z;
+	fb = (*(pStuff *)b)->z;
+	res = ((fa - fb) > 0) ? 1 : ((fa == fb) ? 0 : -1);
+
 	return res;
 }
 
 int main(void) {
-	long *ZX;
-	int howmany = 20;
+	int howmany = ZASIZE;
 
-	Stuff *s;
+	std::vector<pStuff> s(howmany);
 
-	ZX = new long[howmany];
-	zarr = new ZD[howmany];
-	s = new Stuff[howmany];
-
+	std::cout << "\nBefore Sort\n";
 	for(long i = 0; i < howmany; i++) {
-		s[i].z = (double) (1000.0 * rand() / RAND_MAX);
-		s[i].d =  ((double) rand() / RAND_MAX);
-		zarr[i].z = s[i].z;
-		zarr[i].ix = &s[i];
+		s[i] = new Stuff;  									// or could just point at some existing Stuff
+		s[i]->z = (double) (1000.0 * rand() / RAND_MAX);  // pretend this is the distance
+		s[i]->d =  ((double) rand() / RAND_MAX);  // this is data carreied along with it...
 
-		ZX[i] = i;
-		std::cout << "i: " << i << "  Z: " << zarr[i].z << " Stuff: " << s[i].d << "\n";
+		std::cout << "i: " << i << "  Stuff: d:" << s[i]->d << " z:" << s[i]->z << "\n";
 	}
 
-	std::cout << "\n\n\n";
+	qsort(s.data(), howmany, sizeof(pStuff), ZComp);  // do it, do it...
 
-	qsort(ZX, howmany, sizeof(long), ZComp);
-
+	std::cout << "\n\nAfter Sort\n";
 	for(long i = 0; i < howmany; i++) {
-		Stuff *somestuff = (Stuff *) zarr[ZX[i]].ix;
-
-		printf( "i:%i  newi: %i  ZD: %5.1f newZD: %5.1f  Stuff: %5.4f\n", i, ZX[i], zarr[i].z, 
-			zarr[ZX[i]].z, somestuff->d );
+		std::cout << "i: " << i << "  Stuff: d:" << s[i]->d << " z:" << s[i]->z << "\n";
 	}
-
-	// clean up
-	delete[] s;
-	delete[] zarr;
-	delete[] ZX;
 
 	return 0;
 }

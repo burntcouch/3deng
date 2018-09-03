@@ -68,4 +68,13 @@ class Disp3D {
 
 };
 
+#define ZSTART 100
+#define ZGROW 100
+
+// qsort compare function prototypes for z-sorting
+
+int ZSCompS(const void * a, const void * b);
+pV2Screen vec3D_to_screen(pEnv3D wenv, DVector v1, DVector v2, DVector v3);
+int draw_Zsort(pEnv3D wenv);
+
 // end of 3ddisp.h

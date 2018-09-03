@@ -57,33 +57,5 @@ class Trig3D {
 // Trig3D protos
 void draw_Trig3D(SDL_Renderer * renderer, Trig3D *trid);  // a wrapper to draw this stuff easier
 
-// Z-sort array declaration and qsort compare function
-
-
-class ZS3D;
-typedef ZS3D pZS3D;
-
-class ZS3D {   // what we are sorting
-	public:
-		ZS3D();
-		~ZS3D(); 
-	
-		double z;
-		void *zf;
-		double zc;		
-};
-
-ZS3D::ZS3D() {}
-ZS3D::~ZS3D() {}
-
-ZS3D *Zarr;   // the global zsort array
-
-// qsort compare function prototypes for z-sorting
-
-int ZSCompS(pZS3D zarr, const void * a, const void * b);  // current Z-sort uses this one
-int ZSCompS2(const void * a, const void * b);
-
 // end of 3dbase.h
 //
-
-
