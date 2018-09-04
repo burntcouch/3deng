@@ -49,8 +49,12 @@
 #endif
 // class Env3D
 // class Disp3D
-//
-
+// class V2Screen
+// int ZSCompS(const void * a, const void * b)
+// pV2Screen vec3D_to_screen(pEnv3D wenv, pFace3D f)
+// bool vec_to_screen(pEnv3D wenv, DVector v, XYCrd *xy)
+// int draw_Zsort(pEnv3D wenv)
+// int draw_Wire(pEnv3D wenv)
 
 #ifndef __3DGEN
 #include "3dgen.cpp"    // 3d object shape generators and managers

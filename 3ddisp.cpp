@@ -32,16 +32,7 @@
 //*** Env3D
 //
 
-Env3D::Env3D() {}
-Env3D::~Env3D() {}
-
-// definitions
-
-//
-//*** Disp3D
-//
-
-Disp3D::Disp3D() {
+Env3D::Env3D() {
 	winsize.x = 1024;
 	winsize.y = 600;
 	delta = 1.0;
@@ -57,10 +48,9 @@ Disp3D::Disp3D() {
 	startTime = SDL_GetTicks();
 	srand((time(NULL) * startTime) / 997); 
 }
+Env3D::~Env3D() {}
 
-Disp3D::~Disp3D() {}
-
-
+// end of Env3D
 
 // Z-sort array declaration and qsort compare function
 
@@ -81,12 +71,15 @@ class ZS3D {   // what we are sorting
 ZS3D::ZS3D() {}
 ZS3D::~ZS3D() {}
 
-
-
+// face to screen coord. conversion status
+//
 V2Screen::V2Screen() {
 	face = NULL;
+	trig = NULL;
 	area = 0;
-	behind = false;
+	behind = 0.0;
+	toward = 0.0;
+	offscrn = 0;
 }
 
 V2Screen::~V2Screen() {}
@@ -103,7 +96,7 @@ int ZSCompS(const void * a, const void * b) {
 }
 
 // vector to coordinate math
-bool vec_to_screen(pEnv3D wenv, DVector v, pXYCrd xy) {
+int vec_to_screen(pEnv3D wenv, DVector v, pXYCrd xy) {
 	double alim = 3.0 * PI / 4.0;
 	int offs = 0;
 	int slack = 20;
@@ -116,13 +109,13 @@ bool vec_to_screen(pEnv3D wenv, DVector v, pXYCrd xy) {
 
 	if (ia < 0) pt = PI - pt;
 	if (ja < 0) pt = -pt;
-	pp = asin(ka/pr);
+	double pp = asin(ka/pr);
 		// angle limiter for horiz.
 	if (pt > alim) pt = alim;
 	if (pt < -alim) pt = -alim;
-	fx = -wenv->vscal * pt;
-	fy = wenv->vscal * pp;
-	offs = ((fabs(fx) > wenv->hScrn + slack) && (fabs(fy) > wenv->vScrn + slack)) ? 1 : 0;
+	double fx = -wenv->vscal * pt;
+	double fy = wenv->vscal * pp;
+	int offs = ((fabs(fx) > wenv->hScrn + slack) && (fabs(fy) > wenv->vScrn + slack)) ? true : false;
 	xy->x = (int) fx +  wenv->hScrn;
 	xy->y = wenv->vScrn - (int) fy;
 
@@ -141,8 +134,8 @@ pV2Screen vec3D_to_screen(pEnv3D wenv, pFace3D f) {
 	zv = (face->center()).diff(wenv->opos);
 	cv = zv.unit();
 	nv = face->norm();
-	res->toward = cv.dot(nv); //toward < 0, face is 'toward'
-	res->behind = zv.dot(wenv->oiv);  // behind > 0, face is 'ahead'
+	res->toward = cv.dot(nv); //toward < 0, norm of face is 'toward' observer
+	res->behind = zv.dot(wenv->oiv);  // behind > 0, face is 'ahead' of observer
 
 	res->face = f;
 	for (int i = 0; i < 3; i++) {
